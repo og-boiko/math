@@ -121,7 +121,7 @@ export function Hub() {
         <Card className="bg-brand-600 text-white border-brand-700">
           <h3 className="text-xl font-extrabold mb-1">⚡ Швидкий старт</h3>
           <p className="text-sm opacity-90 mb-3">
-            10 задач зі слабкої теми. Найшвидший спосіб потренуватися.
+            Задачі по темах.
           </p>
           <Button variant="secondary" onClick={quickStart}>
             Поїхали →

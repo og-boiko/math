@@ -22,7 +22,7 @@ export function Welcome() {
       <div className="text-center mb-6">
         <div className="text-6xl mb-2">🧠✨</div>
         <h1 className="text-3xl font-extrabold text-brand-700">MathQuest</h1>
-        <p className="text-slate-600 mt-1">Тренуйся щодня - стань майстром математики! А то получиш по сраці :) </p>
+        <p className="text-slate-600 mt-1">Тренуйся щодня - А то получиш по сраці :) </p>
       </div>
       <Card>
         <form onSubmit={handleSubmit} className="space-y-4">

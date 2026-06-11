@@ -1,11 +1,24 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Volume2, VolumeX, Target, Palette, Trash2, Shield } from 'lucide-react';
+import {
+  ChevronLeft,
+  Volume2,
+  VolumeX,
+  Target,
+  Palette,
+  Trash2,
+  LogOut,
+  Cloud,
+  Trophy,
+} from 'lucide-react';
 import { useProfileStore } from '@/store/profile';
 import { themePacks } from '@/features/themes/registry';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { setSoundsEnabled, playSound } from '@/lib/sounds';
+import { cloudEnabled, supabase } from '@/cloud/supabase';
+import { fetchMyFullSnapshot, setMyLeaderboardOptIn } from '@/cloud/api/me';
+import { resetSyncState } from '@/cloud/sync/cloudSync';
 
 export function Settings() {
   const navigate = useNavigate();
@@ -16,6 +29,15 @@ export function Settings() {
   const resetProfile = useProfileStore((s) => s.resetProfile);
 
   const [showReset, setShowReset] = useState(false);
+  const [email, setEmail] = useState<string | null>(null);
+  const [optIn, setOptIn] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (!cloudEnabled) return;
+    const supa = supabase();
+    supa?.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? null));
+    fetchMyFullSnapshot().then((s) => setOptIn(s?.child.leaderboard_opt_in ?? null));
+  }, []);
 
   const toggleSounds = () => {
     const next = !profile.settings.soundsEnabled;
@@ -27,6 +49,21 @@ export function Settings() {
   const handleReset = () => {
     resetProfile();
     navigate('/welcome');
+  };
+
+  const handleSignOut = async () => {
+    const supa = supabase();
+    if (supa) await supa.auth.signOut();
+    resetSyncState();
+    resetProfile();
+    navigate('/welcome');
+  };
+
+  const toggleOptIn = async () => {
+    if (optIn === null) return;
+    const next = !optIn;
+    setOptIn(next);
+    await setMyLeaderboardOptIn(next);
   };
 
   return (
@@ -128,25 +165,56 @@ export function Settings() {
         </div>
       </Card>
 
-      {/* Батьківська панель */}
-      <Card className="mb-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Shield size={22} className="text-brand-600" />
-            <div>
-              <div className="font-bold">Батьківська панель</div>
-              <div className="text-xs text-slate-500">
-                {profile.settings.parentPinHash
-                  ? 'PIN встановлено'
-                  : 'PIN ще не встановлено'}
+      {/* Акаунт у хмарі */}
+      {cloudEnabled && (
+        <Card className="mb-3">
+          <div className="flex items-center gap-3 mb-3">
+            <Cloud size={22} className="text-brand-600" />
+            <div className="flex-1 min-w-0">
+              <div className="font-bold">Акаунт у хмарі</div>
+              <div className="text-xs text-slate-500 truncate">
+                {email ?? 'Гостьовий профіль (без акаунту)'}
               </div>
             </div>
           </div>
-          <Button size="sm" variant="secondary" onClick={() => navigate('/parent')}>
-            Відкрити
-          </Button>
-        </div>
-      </Card>
+          {email ? (
+            <Button variant="ghost" onClick={handleSignOut}>
+              <LogOut size={16} className="mr-1" />
+              Вийти з акаунту
+            </Button>
+          ) : (
+            <Button variant="secondary" onClick={() => navigate('/auth')}>
+              Створити акаунт або увійти
+            </Button>
+          )}
+        </Card>
+      )}
+
+      {/* Лідерборд opt-in */}
+      {cloudEnabled && optIn !== null && (
+        <Card className="mb-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Trophy size={22} className="text-amber-500" />
+              <div>
+                <div className="font-bold">Брати участь у лідерборді</div>
+                <div className="text-xs text-slate-500">
+                  Тільки ім'я профілю та XP — без email
+                </div>
+              </div>
+            </div>
+            <button
+              onClick={toggleOptIn}
+              className={`relative w-12 h-7 rounded-full transition ${optIn ? 'bg-brand-600' : 'bg-slate-300'}`}
+              aria-label="toggle leaderboard"
+            >
+              <span
+                className={`absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow transition-transform ${optIn ? 'translate-x-5' : ''}`}
+              />
+            </button>
+          </div>
+        </Card>
+      )}
 
       {/* Скидання */}
       <Card className="border-rose-200">

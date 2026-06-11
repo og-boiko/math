@@ -1,6 +1,12 @@
 # MathQuest
 
-PWA-тренажер математики для підготовки до 5 класу. Український інтерфейс, гейміфікація: зірки, рівні, стрик, ачивки, профіль, календар, тематична карта світу і батьківська панель.
+PWA-тренажер математики для підготовки до 5 класу. Український інтерфейс,
+гейміфікація: зірки, рівні, стрик, ачивки, профіль, календар, тематична
+карта світу.
+
+З **v2** (червень 2026) — опціональна **хмарна синхронізація через Supabase**:
+один email-акаунт = один профіль, доступний з будь-якого пристрою. Без хмари
+застосунок працює повністю локально (zustand+persist).
 
 ## Швидкий старт
 
@@ -9,15 +15,13 @@ npm install
 npm run dev
 ```
 
-Відкрити: `http://localhost:5173`
+Відкрити: <http://localhost:5173>
 
 З телефона в тій же Wi-Fi мережі:
 
 ```bash
 npm run dev -- --host
 ```
-
-→ скопіювати URL з `Network:` (наприклад `http://192.168.x.x:5173`).
 
 ## Збірка
 
@@ -26,7 +30,20 @@ npm run build
 npm run preview
 ```
 
-Результат — у `dist/`. PWA-маніфест та service worker генеруються автоматично через `vite-plugin-pwa`.
+Результат — у `dist/`. PWA-маніфест та service worker генеруються автоматично.
+
+## Хмара (опціонально)
+
+Усе про Supabase-бекенд — у [`docs/CLOUD.md`](docs/CLOUD.md). Коротко:
+
+1. Створити Supabase-проект → залити 5 SQL-міграцій із `supabase/migrations/`
+2. У Auth Settings: ✅ Sign Ups, ❌ Confirm Email
+3. Додати в `.env.local`:
+   ```env
+   VITE_SUPABASE_URL=https://<project>.supabase.co
+   VITE_SUPABASE_ANON_KEY=eyJhbGci...
+   ```
+4. `npm run dev` — на `/welcome` з'явиться картка "Створити акаунт або увійти"
 
 ## Деплой на Cloudflare Pages
 
@@ -36,92 +53,92 @@ npm run preview
    - Framework preset: **None**
    - Build command: `npm run build`
    - Build output directory: `dist`
-   - Node version (Environment variable `NODE_VERSION`): `20`
-4. Save and Deploy.
+   - Node version: `20` (через env-var `NODE_VERSION`)
+4. Environment variables: додати `VITE_SUPABASE_URL` і `VITE_SUPABASE_ANON_KEY`.
+5. Save and Deploy.
 
 ## Структура
 
 ```
 src/
   app/                  # App, маршрути
-  pages/                # Welcome, ThemeSelect, Hub, Practice, Task, Results,
-                        # Errors, Profile, Calendar, Settings, WorldMap,
-                        # Exams, ParentLogin, ParentPanel
-  components/           # UI-компоненти (Card, Button, HintPanel, ProgressBar,
+  pages/                # Welcome, Auth, ThemeSelect, Hub, Practice, Task,
+                        # Results, Errors, Profile, Calendar, Settings,
+                        # WorldMap, Exams, Leaderboard
+  components/           # UI (Card, Button, HintPanel, ProgressBar,
                         # AchievementToast, Confetti)
   features/
-    tasks/              # генератори і реєстр + контрольні (exams.ts)
+    tasks/              # генератори і реєстр + контрольні
     themes/             # сетинги (космос, динозаври, світ, воксельний, блочний)
-    achievements/       # ≥15 ачивок з умовами на профіль
+    achievements/       # ≥15 ачивок
   store/
-    profile.ts          # Zustand-стор + persist (профіль, теми, помилки, ачивки)
-    profile-types.ts    # типи (винесено окремо, щоб уникнути циклу)
-    session.ts          # активна сесія (звичайна або review)
+    profile.ts          # Zustand+persist (профіль, теми, помилки, ачивки)
+    profile-types.ts    # типи окремо (avoid циклу)
+    session.ts          # активна сесія
+  cloud/                # Supabase інтеграція (no-op без env)
+    supabase.ts
+    api/me.ts           # RPC-обгортки для одного профілю
+    api/leaderboard.ts  # читання публічних борд
+    sync/cloudSync.ts   # debounced push + hydrate
   lib/
-    random.ts           # детермінований randInt, choice, shuffle
-    format.ts           # парсинг / нормалізація / checkAnswer
-    sounds.ts           # Web Audio API: correct / wrong / finish / levelUp
-    dates.ts            # todayKey, dayDiff, addDays, formatRelative
-    pin.ts              # SHA-256 для PIN батьківської панелі
-  styles/globals.css    # Tailwind + keyframes (toast, confetti, pop-in)
-public/                 # icons (192/512/maskable), favicon
-docs/                   # SPEC.md, CONTENT.md, ROADMAP.md
+    random.ts · format.ts · sounds.ts · dates.ts · pin.ts
+  styles/globals.css
+supabase/
+  migrations/           # 5 SQL-міграцій
+public/                 # icons
+docs/                   # SPEC.md, CONTENT.md, ROADMAP.md, CLOUD.md
 ```
 
-## Що працює (MVP+)
+## Що працює (v2)
 
 ### Навчання
 
-- Усі **10 тем** (`oral`, `column`, `order`, `fractions`, `decimals`, `word`,
-  `units`, `geometry`, `logic`, `equations`) із 5 рівнями складності.
-- Підтеми за зразком шкільних самостійних (зокрема ділення з підбором частки,
-  приведення до одиниці, круги Ейлера, степені, подвійні нерівності).
-- Контрольні роботи (екзамени) з оцінкою за 12-бальною шкалою.
-- 2 рівні підказок + повне рішення на кожну задачу.
-- Адаптивна складність: +1 рівень після 3 правильних підряд, −1 після 2 помилок.
+- 10 тем (`oral`, `column`, `order`, `fractions`, `decimals`, `word`,
+  `units`, `geometry`, `logic`, `equations`) із 5 рівнями складності
+- Підтеми за зразком шкільних самостійних (ділення з підбором частки,
+  приведення до одиниці, круги Ейлера, степені, подвійні нерівності)
+- Контрольні роботи з оцінкою за 12-бальною шкалою
+- 2 рівні підказок + повне рішення на кожну задачу
+- Адаптивна складність: +1 після 3 правильних підряд, −1 після 2 помилок
 
 ### Гейміфікація
 
-- Зірки (3/2/1/0), XP, рівні (формула `√(xp/100)+1`), валюта по сетингу.
-- **Streak**: щоденний візит, найдовший streak, ачивки на 3/7/30 днів.
-- **≥15 ачивок**: перші задачі, сотня, зірки, рівні, streak, перфектні сесії,
-  блискавка, майстер теми, всеїдний, випускник, робота над помилками…
-- Глобальний тостер ачивок (`AchievementToast`) та CSS-конфеті на результатах.
-- Денна ціль (задачі / хвилини) з прогрес-баром на Hub-екрані.
+- Зірки (3/2/1/0), XP, рівні, валюта по сетингу
+- Streak (поточний + найдовший), щоденна ціль
+- ≥15 ачивок, тостер, конфеті
+- Героїчний `/map` із прогресом по локаціях
 
 ### Робота над помилками
 
-- Журнал помилок з інтервальним повторенням (1, 2, 4, 8, 16 днів).
-- 5 успішних повторень → задача йде з черги, фіксується як виправлена.
-- Окремий екран `/errors` зі своєю сесією review-режиму.
+- Журнал помилок із інтервальним повторенням (1, 2, 4, 8, 16 днів)
+- 5 успішних повторень → задача йде з черги
+- Окремий екран `/errors` із session-режимом review
 
-### Профіль, статистика, налаштування
+### Хмара (v2, нове)
 
-- `/profile` — статистика, прогрес по темах, отримані ачивки.
-- `/calendar` — heat-map активності за 12 тижнів.
-- `/map` — тематична карта світу з лінійним прогресом по сетингу.
-- `/settings` — звуки, денна ціль, зміна сетингу, PIN, повне скидання.
-
-### Батьківська панель
-
-- PIN через SHA-256 (`/parent/login`).
-- `/parent` — зведення, точність по темах, слабкі теми, експорт JSON.
+- Email + password signup без email-confirmation
+- Один акаунт = один профіль (без сімей, без pairing-кодів)
+- Debounced push (4с) усього стану: stats, topics, today's activity, error queue
+- Hydrate з повного snapshot після login на новому пристрої
+- Публічний лідерборд (тиждень / streak / сезон) з opt-in перемикачем
+- Logout-кнопка на `/settings`
+- Робота повністю офлайн коли `.env.local` без Supabase-ключів
 
 ### Платформа
 
-- PWA: повний маніфест, іконки 192/512/maskable, apple-touch-icon.
-- Звукові ефекти через Web Audio API (без зовнішніх файлів).
-- Анімації: pop-in, slide-in (toast), конфеті — у CSS keyframes.
-- `tailwind-merge` для безпечного перевизначення класів у UI-компонентах.
+- PWA: повний маніфест, іконки 192/512/maskable, apple-touch-icon
+- Web Audio API для звуків (без зовнішніх файлів)
+- Анімації: pop-in, slide-in toast, конфеті — у CSS keyframes
+- `tailwind-merge` для безпечного перевизначення класів
 
 ## Документація
 
-- [`docs/SPEC.md`](docs/SPEC.md) — повна функціональна специфікація.
-- [`docs/CONTENT.md`](docs/CONTENT.md) — мапа тем, підтем і рівнів складності.
-- [`docs/ROADMAP.md`](docs/ROADMAP.md) — поточний статус і плани (v2.0).
+- [`docs/SPEC.md`](docs/SPEC.md) — функціональна специфікація
+- [`docs/CONTENT.md`](docs/CONTENT.md) — мапа тем, підтем, рівнів
+- [`docs/ROADMAP.md`](docs/ROADMAP.md) — статус і плани
+- [`docs/CLOUD.md`](docs/CLOUD.md) — Supabase setup і flow
 
 ## Стек
 
 Vite 5 · React 18 · TypeScript 5 · Tailwind 3 · Zustand 4 · React Router 6 ·
-lucide-react · tailwind-merge · vite-plugin-pwa.
-
+lucide-react · tailwind-merge · vite-plugin-pwa · Supabase JS v2.

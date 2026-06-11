@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-route
 import { useProfileStore } from '@/store/profile';
 import { setSoundsEnabled } from '@/lib/sounds';
 import { Welcome } from '@/pages/Welcome';
+import { Auth } from '@/pages/Auth';
 import { ThemeSelect } from '@/pages/ThemeSelect';
 import { Hub } from '@/pages/Hub';
 import { Practice } from '@/pages/Practice';
@@ -14,26 +15,13 @@ import { Settings } from '@/pages/Settings';
 import { Profile } from '@/pages/Profile';
 import { Calendar } from '@/pages/Calendar';
 import { WorldMap } from '@/pages/WorldMap';
-import { ParentLogin } from '@/pages/ParentLogin';
-import { ParentPanel } from '@/pages/ParentPanel';
+import { Leaderboard } from '@/pages/Leaderboard';
 import { AchievementToast } from '@/components/AchievementToast';
 
 function RequireProfile({ children }: { children: ReactNode }) {
   const profile = useProfileStore((s) => s.profile);
   if (!profile?.name) return <Navigate to="/welcome" replace />;
   if (!profile?.theme) return <Navigate to="/theme-select" replace />;
-  return <>{children}</>;
-}
-
-function RequireParent({ children }: { children: ReactNode }) {
-  const profile = useProfileStore((s) => s.profile);
-  if (!profile?.name) return <Navigate to="/welcome" replace />;
-  // Без PIN — спочатку до сторінки створення
-  if (!profile.settings.parentPinHash) return <Navigate to="/parent/login" replace />;
-  // PIN є, але ще не введений у поточній сесії
-  if (sessionStorage.getItem('parent-authed') !== '1') {
-    return <Navigate to="/parent/login" replace />;
-  }
   return <>{children}</>;
 }
 
@@ -57,6 +45,7 @@ export function App() {
       <AchievementToast />
       <Routes>
         <Route path="/welcome" element={<Welcome />} />
+        <Route path="/auth" element={<Auth />} />
         <Route path="/theme-select" element={<ThemeSelect />} />
         <Route path="/" element={<RequireProfile><Hub /></RequireProfile>} />
         <Route path="/practice" element={<RequireProfile><Practice /></RequireProfile>} />
@@ -68,8 +57,7 @@ export function App() {
         <Route path="/profile" element={<RequireProfile><Profile /></RequireProfile>} />
         <Route path="/calendar" element={<RequireProfile><Calendar /></RequireProfile>} />
         <Route path="/map" element={<RequireProfile><WorldMap /></RequireProfile>} />
-        <Route path="/parent/login" element={<RequireProfile><ParentLogin /></RequireProfile>} />
-        <Route path="/parent" element={<RequireParent><ParentPanel /></RequireParent>} />
+        <Route path="/leaderboard" element={<RequireProfile><Leaderboard /></RequireProfile>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

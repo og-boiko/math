@@ -143,6 +143,21 @@ interface ProfileState {
   updateDailyGoal: (goal: DailyGoal) => void;
   consumePendingAchievements: () => string[];
   resetProfile: () => void;
+  hydrateFromSnapshot: (snap: {
+    child: { display_name: string; age: number; theme: string };
+    stats: {
+      level: number;
+      xp: number;
+      stars: number;
+      coins: number;
+      streak: number;
+      longest_streak: number;
+      total_attempts: number;
+      total_correct: number;
+      achievements: string[] | null;
+      last_active_date: string | null;
+    } | null;
+  }) => void;
 }
 
 function emptyProfile(name: string, age: number): Profile {
@@ -360,6 +375,26 @@ export const useProfileStore = create<ProfileState>()(
       },
 
       resetProfile: () => set({ profile: null }),
+
+      hydrateFromSnapshot: (snap) =>
+        set((s) => {
+          const base = s.profile ?? emptyProfile(snap.child.display_name, snap.child.age);
+          const next: Profile = {
+            ...base,
+            name: snap.child.display_name,
+            age: snap.child.age,
+            theme: (snap.child.theme as ThemeId) ?? base.theme,
+            level: snap.stats?.level ?? base.level,
+            xp: snap.stats?.xp ?? base.xp,
+            stars: snap.stats?.stars ?? base.stars,
+            coins: snap.stats?.coins ?? base.coins,
+            streak: snap.stats?.streak ?? base.streak,
+            longestStreak: snap.stats?.longest_streak ?? base.longestStreak,
+            achievements: snap.stats?.achievements ?? base.achievements,
+            lastActiveDate: snap.stats?.last_active_date ?? base.lastActiveDate,
+          };
+          return { profile: next };
+        }),
     }),
     {
       name: 'mathquest-profile-v2',

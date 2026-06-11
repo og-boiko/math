@@ -124,7 +124,7 @@ export function Hub() {
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
             <Target size={18} className="text-brand-600" />
-            <span className="font-bold text-sm">Сьогодні</span>
+            <span className="font-bold text-sm">Сьогодні </span>
           </div>
           <span className="text-xs font-bold text-slate-500">
             {done} / {goal} задач

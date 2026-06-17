@@ -29,7 +29,7 @@ export function Partners() {
             <div className="md:col-span-8 space-y-4">
               <div className="inline-flex items-center gap-2 text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full">
                 <GraduationCap size={14} />
-                Офлайн та онлайннавчання іноземних мов у Чернівцях
+                Офлайн та онлайн навчання іноземних мов у Чернівцях
               </div>
               <h3 className="text-2xl font-extrabold text-slate-900">
                 Мовна школа YaK Language School

@@ -7,6 +7,7 @@ import { Screenshots } from './sections/Screenshots';
 import { Topics } from './sections/Topics';
 import { Stats } from './sections/Stats';
 import { FAQ } from './sections/FAQ';
+import { Partners } from './sections/Partners';
 import { CTA } from './sections/CTA';
 import { LandingFooter } from './sections/Footer';
 
@@ -32,6 +33,7 @@ export function Landing() {
         <Topics />
         <Screenshots />
         <FAQ />
+        <Partners />
         <CTA />
       </main>
       <LandingFooter />

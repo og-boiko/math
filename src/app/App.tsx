@@ -22,6 +22,10 @@ const Landing = lazy(() =>
   import('@/landing/Landing').then((m) => ({ default: m.Landing })),
 );
 
+const TopicSEO = lazy(() =>
+  import('@/pages/TopicSEO').then((m) => ({ default: m.TopicSEO })),
+);
+
 function RequireProfile({ children }: { children: ReactNode }) {
   const profile = useProfileStore((s) => s.profile);
   if (!profile?.name) return <Navigate to="/welcome" replace />;
@@ -162,6 +166,7 @@ export function App() {
       <Suspense fallback={<LandingFallback />}>
         <Routes>
           <Route path="/" element={<Landing />} />
+          <Route path="/topics/:topicId" element={<TopicSEO />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>

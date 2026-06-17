@@ -25,23 +25,24 @@ export function Topics() {
 
         <ul className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {TOPICS.map((t) => (
-            <li
+            <a
+              href={`/topics/${t.id}`}
               key={t.id}
               className="group rounded-2xl bg-white border border-slate-200 p-4 flex items-center gap-4
                 hover:border-brand-300 hover:shadow-md hover:shadow-brand-900/5 transition"
             >
               <span
                 className="w-12 h-12 grid place-items-center rounded-xl bg-gradient-to-br from-brand-50 to-fuchsia-50
-                  ring-1 ring-brand-100 text-2xl"
+                  ring-1 ring-brand-100 text-2xl shrink-0"
                 aria-hidden
               >
                 {t.emoji}
               </span>
               <div className="min-w-0 flex-1">
-                <div className="font-extrabold text-slate-900">{t.name}</div>
+                <div className="font-extrabold text-slate-900 group-hover:text-brand-600 transition">{t.name}</div>
                 <div className="text-sm text-slate-500 font-mono truncate">{t.sample}</div>
               </div>
-            </li>
+            </a>
           ))}
         </ul>
       </div>

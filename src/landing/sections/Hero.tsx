@@ -47,9 +47,12 @@ export function Hero() {
               >
                 Почати безкоштовно <ArrowRight size={18} />
               </a>
-              <div className="flex items-center justify-center gap-2 h-14 px-6 rounded-2xl border-2 border-slate-200/50 bg-white/50 text-slate-600 font-bold backdrop-blur-sm sm:w-auto">
+              <a
+                href="#how"
+                className="flex items-center justify-center gap-2 h-14 px-6 rounded-2xl border-2 border-slate-200/50 bg-white/50 text-slate-600 font-bold backdrop-blur-sm sm:w-auto hover:border-brand-300 hover:text-brand-700 transition"
+              >
                 Як це працює
-              </div>
+              </a>
             </div>
 
             <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-slate-600">

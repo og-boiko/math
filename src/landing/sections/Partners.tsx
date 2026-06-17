@@ -50,6 +50,62 @@ export function Partners() {
             </div>
           </div>
         </div>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+          {/* YaKids */}
+          <div className="bg-white border border-slate-200 rounded-[2rem] p-6 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-amber-400 to-orange-400 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="h-14 w-14 rounded-2xl bg-amber-50 flex items-center justify-center mb-5 border border-amber-100">
+              <span className="font-black text-xl text-amber-600">YK</span>
+            </div>
+            <div className="inline-flex items-center gap-1.5 text-[10px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full mb-3 uppercase tracking-wider">
+              Незабаром
+            </div>
+            <h3 className="text-xl font-bold text-slate-900 mb-2">YaKids</h3>
+            <p className="text-slate-600 text-sm mb-4">
+              Садок неповного дня. Безпечний та комфортний простір для розвитку ваших дітей.
+            </p>
+            <a href="https://yakids.com.ua" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-brand-600 font-bold text-sm inline-flex items-center gap-1 transition-colors">
+              yakids.com.ua <Globe size={14} />
+            </a>
+          </div>
+
+          {/* YaKnow */}
+          <div className="bg-white border border-slate-200 rounded-[2rem] p-6 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="h-14 w-14 rounded-2xl bg-blue-50 flex items-center justify-center mb-5 border border-blue-100">
+              <span className="font-black text-xl text-blue-600">YN</span>
+            </div>
+            <div className="inline-flex items-center gap-1.5 text-[10px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full mb-3 uppercase tracking-wider">
+              Незабаром
+            </div>
+            <h3 className="text-xl font-bold text-slate-900 mb-2">YaKnow</h3>
+            <p className="text-slate-600 text-sm mb-4">
+              Новий освітній проєкт від сім'ї YaK. Слідкуйте за оновленнями.
+            </p>
+            <a href="https://yaknow.com.ua" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-brand-600 font-bold text-sm inline-flex items-center gap-1 transition-colors">
+              yaknow.com.ua <Globe size={14} />
+            </a>
+          </div>
+
+          {/* YaKo */}
+          <div className="bg-white border border-slate-200 rounded-[2rem] p-6 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 to-teal-400 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="h-14 w-14 rounded-2xl bg-emerald-50 flex items-center justify-center mb-5 border border-emerald-100">
+              <span className="font-black text-xl text-emerald-600">YK</span>
+            </div>
+            <div className="inline-flex items-center gap-1.5 text-[10px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full mb-3 uppercase tracking-wider">
+              Незабаром
+            </div>
+            <h3 className="text-xl font-bold text-slate-900 mb-2">YaKo</h3>
+            <p className="text-slate-600 text-sm mb-4">
+              Технологічний простір та нові можливості для навчання. Деталі згодом.
+            </p>
+            <a href="https://yako.com.ua" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-brand-600 font-bold text-sm inline-flex items-center gap-1 transition-colors">
+              yako.com.ua <Globe size={14} />
+            </a>
+          </div>
+        </div>
       </div>
     </section>
   );

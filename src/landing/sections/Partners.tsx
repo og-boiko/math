@@ -12,32 +12,30 @@ export function Partners() {
             Розвиваємося разом
           </h2>
           <p className="mt-4 text-base sm:text-lg text-slate-600">
-            Проєкти, які допомагають дітям отримувати якісну та цікаву освіту в Україні.
+            Проєкти, які допомагають дітям отримувати якісну та цікаву освіту в Україні та в Чернівцях.
           </p>
         </div>
 
         <div className="bg-white border border-slate-200 rounded-[2.5rem] p-8 sm:p-12 shadow-lg hover:shadow-xl transition-shadow duration-300">
           <div className="grid md:grid-cols-12 gap-8 items-center">
-            <div className="md:col-span-4 flex flex-col items-center justify-center text-center p-8 bg-gradient-to-br from-indigo-50 to-brand-50 rounded-3xl border border-brand-100/50">
-              <span className="text-5xl mb-4" role="img" aria-label="School">🏫</span>
-              <div className="font-black text-2xl tracking-tight text-slate-900">
-                YaK
-              </div>
-              <div className="text-sm font-bold text-brand-600 uppercase tracking-wider mt-1">
-                Language School
-              </div>
+            <div className="md:col-span-4 flex items-center justify-center p-6 bg-slate-50/50 rounded-3xl border border-slate-100">
+              <img
+                src="/yakls-logo.png"
+                alt="YaK Language School Logo"
+                className="max-h-32 w-auto object-contain hover:scale-105 transition duration-300"
+              />
             </div>
 
             <div className="md:col-span-8 space-y-4">
               <div className="inline-flex items-center gap-2 text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full">
                 <GraduationCap size={14} />
-                Онлайн-навчання іноземних мов
+                Офлайн та онлайннавчання іноземних мов у Чернівцях
               </div>
               <h3 className="text-2xl font-extrabold text-slate-900">
                 Мовна школа YaK Language School
               </h3>
               <p className="text-slate-600 leading-relaxed text-sm sm:text-base">
-                Якісне та сучасне вивчення іноземних мов (англійська, німецька, польська) для дітей та дорослих. Індивідуальний підхід, інтерактивні заняття та досвідчені викладачі, які закохують у знання з першого уроку.
+                Якісне та сучасне вивчення іноземних мов (англійська, німецька, іспанська) для дітей та дорослих. Індивідуальний підхід, інтерактивні заняття та досвідчені викладачі, які закохують у знання з першого уроку.
               </p>
               <div className="pt-2">
                 <a

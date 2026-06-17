@@ -1,0 +1,36 @@
+/**
+ * Конфіг Cloudflare Workers (для деплою через `wrangler deploy`).
+ *
+ * Ми не пишемо власний Worker-код — ми просто деплоїмо статичні
+ * ассети зі складеного `dist/` як SPA. Cloudflare сам обслуговує
+ * усі запити: якщо існує файл — повертає його, якщо ні —
+ * віддає `index.html` (через `not_found_handling`), що дозволяє
+ * нашому React-роутеру взяти на себе маршрутизацію (включно
+ * з `/app/*` і будь-якими підшляхами).
+ *
+ * Тому файл `public/_redirects` НЕ потрібен (і навіть шкідливий —
+ * Cloudflare валідатор кидав «Infinite loop detected» при правилі
+ * `/*  /index.html  200` поруч з not_found_handling=single-page-application).
+ *
+ * Якщо колись захочемо власний Worker-код (наприклад, ребрендинг
+ * заголовків чи API-проксі для Supabase) — додамо поле `main` із
+ * шляхом до TS-файлу і виставимо `compatibility_date`.
+ *
+ * Docs: https://developers.cloudflare.com/workers/static-assets/
+ */
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "math",
+  "compatibility_date": "2026-06-17",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    // Статичні файли з `dist/` після `vite build`.
+    "directory": "./dist",
+    // Будь-який запит, для якого немає файлу, обслуговуємо як SPA —
+    // тобто повертаємо `/index.html`, а React Router розбере шлях.
+    "not_found_handling": "single-page-application"
+  },
+  "observability": {
+    "enabled": true
+  }
+}

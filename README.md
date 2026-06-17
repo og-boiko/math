@@ -53,34 +53,54 @@ npm run preview
    ```
 4. `npm run dev` — на `/welcome` з'явиться картка "Створити акаунт або увійти"
 
-## Деплой на Cloudflare Pages
+## Деплой на Cloudflare Workers (рекомендовано)
+
+Cloudflare Workers Static Assets — найшвидший і найдешевший спосіб для нашого
+SPA. Конфіг — у `wrangler.jsonc` (включено в репо).
 
 1. Запушити репо у GitHub.
-2. Cloudflare Pages → Create project → Connect Git → обрати репо.
+2. Cloudflare → Workers & Pages → Create → Connect to Git → обрати репо.
 3. Build settings:
-   - Framework preset: **None**
    - Build command: `npm run build`
+   - Deploy command: `npx wrangler deploy`
    - Build output directory: `dist`
-   - Node version: `20` (через env-var `NODE_VERSION`)
+   - Node version: `22` (через env-var `NODE_VERSION`)
 4. Environment variables: додати `VITE_SUPABASE_URL` і `VITE_SUPABASE_ANON_KEY`.
 5. Save and Deploy.
 
-### SPA маршрутизація на різних хостах
+> ⚠️ **Не додавайте `public/_redirects`** при деплої на Workers — `wrangler.jsonc`
+> вже задає `not_found_handling: "single-page-application"`, і їх поєднання
+> викликає помилку валідатора `Infinite loop detected`.
+
+### Деплой на Vercel (альтернатива)
+
+`vercel.json` уже налаштований: rewrites на `/index.html` для всіх неіснуючих
+шляхів + immutable-кеш для `/assets/*` + security headers.
+
+```bash
+npm i -g vercel
+vercel deploy --prod
+```
+
+### SPA маршрутизація
 
 Сайт використовує **чистий SPA mode** з кодом-сплітингом:
 
-- **`/`** → лендінг (маркетинг, SEO, юристи)
-- **`/app/*`** → основний додаток (приватні сторінки, гейміфікація)
+- **`/`** → лендінг (маркетинг, SEO, публічна сторінка)
+- **`/app/*`** → основний додаток (профіль, тренування, гейміфікація)
 
-Для правильної маршрутизації додано конфігурації для популярних хостів:
+Конфігурації для популярних хостів:
 
-- **Vercel** (`vercel.json`): `rewrites` перенаправляє усе в `/index.html`
-- **Netlify** / **Cloudflare** (`public/_redirects`): правило `/* /index.html 200` для SPA fallback
-- **Vite config** (`vite.config.ts`): PWA manifest, іконки та інші асети задійсті
+| Хост | Файл | Як працює |
+|---|---|---|
+| **Cloudflare Workers** | `wrangler.jsonc` | `assets.not_found_handling: "single-page-application"` — будь-який 404 повертає `index.html` |
+| **Vercel** | `vercel.json` | `rewrites` `/app/(.*) → /index.html` + immutable cache для `/assets/*` |
+| **Netlify** | (можна додати `public/_redirects`) | `/* /index.html 200` — fallback на index |
 
-При first load / hard-refresh браузер отримує `index.html` з SSR-фолбеком (невільний), потім
-React монтує лендінг чи додаток залежно від `location.pathname`. Лендінг завантажується
-лініво (`lazy()`) → первий page load легший на ~40% для користувачів, які просто читають про сайт.
+При first load / hard-refresh браузер отримує `index.html` з SSR-фолбеком, потім
+React монтує лендінг чи додаток залежно від `location.pathname`. Лендінг
+завантажується лініво (`lazy()`) → первий page load легший на ~40% для тих,
+хто просто читає про сайт.
 
 ## Структура
 

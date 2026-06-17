@@ -45,4 +45,23 @@ export default defineConfig({
   resolve: {
     alias: { '@': path.resolve(__dirname, 'src') },
   },
+  build: {
+    // Розбиваємо великий index.js на менші чанки, щоб Cloudflare/Vercel
+    // не падали на ліміті розміру окремого файлу і браузер кешував залежності
+    // окремо від нашого коду (рідше інвалідація → швидші повторні візити).
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'state-vendor': ['zustand'],
+          'icons-vendor': ['lucide-react'],
+          'supabase-vendor': ['@supabase/supabase-js'],
+        },
+      },
+    },
+    // Підвищуємо межу попередження — у нас є один великий чанк додатку.
+    chunkSizeWarningLimit: 700,
+    // Source maps лише в DEV — у проді не треба, бо роздуває деплой.
+    sourcemap: false,
+  },
 });

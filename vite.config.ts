@@ -19,8 +19,8 @@ export default defineConfig({
         'sitemap.xml',
       ],
       manifest: {
-        name: 'MathQuest — тренажер математики',
-        short_name: 'MathQuest',
+        name: 'YaKMath — тренажер математики',
+        short_name: 'YaKMath',
         description: 'Тренажер математики для 4–5 класу. Українською.',
         lang: 'uk',
         theme_color: '#7c3aed',

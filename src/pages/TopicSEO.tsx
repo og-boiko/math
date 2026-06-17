@@ -155,7 +155,7 @@ export function TopicSEO() {
       const originalTitle = document.title;
       const originalDesc = document.querySelector('meta[name="description"]')?.getAttribute('content');
 
-      document.title = `MathQuest — Тренажер: ${meta.name} (4–5 клас НУШ)`;
+      document.title = `YaKMath — Тренажер: ${meta.name} (4–5 клас НУШ)`;
       
       const descTag = document.querySelector('meta[name="description"]');
       if (descTag) {
@@ -213,7 +213,7 @@ export function TopicSEO() {
             <span>На головну</span>
           </button>
           <div className="flex items-center gap-1.5 font-black text-brand-700 text-xl">
-            🧠 MathQuest
+            🧠 YaKMath
           </div>
         </div>
       </header>

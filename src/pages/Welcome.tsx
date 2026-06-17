@@ -26,7 +26,7 @@ export function Welcome() {
     <div className="container-app min-h-screen flex flex-col justify-center py-8">
       <div className="text-center mb-6">
         <div className="text-6xl mb-2">🧠✨</div>
-        <h1 className="text-4xl font-extrabold text-brand-700">MathQuest</h1>
+        <h1 className="text-4xl font-extrabold text-brand-700">YaKMath</h1>
         <p className="text-slate-600 mt-1">
           Математика як гра. Щодня по трохи — і ти бос.
         </p>

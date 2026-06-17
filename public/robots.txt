@@ -8,4 +8,4 @@ Disallow: /app/results
 Disallow: /app/settings
 Disallow: /app/profile
 
-Sitemap: https://mathquest.com.ua/sitemap.xml
+Sitemap: https://yakmath.com.ua/sitemap.xml

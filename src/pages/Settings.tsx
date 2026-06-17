@@ -283,7 +283,7 @@ export function Settings() {
         )}
       </Card>
 
-      <div className="text-center text-xs text-slate-400 mt-6">MathQuest v0.5</div>
+      <div className="text-center text-xs text-slate-400 mt-6">YaKMath v0.5</div>
     </div>
   );
 }

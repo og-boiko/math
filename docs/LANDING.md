@@ -1,4 +1,4 @@
-# MathQuest — Лендінг-сторінка і SEO (v2.2)
+# YaKMath — Лендінг-сторінка і SEO (v2.2)
 
 ## Огляд
 
@@ -126,19 +126,19 @@
 
 ```html
 <!-- Primary SEO -->
-<title>MathQuest — тренажер математики для 4–5 класу українською</title>
+<title>YaKMath — тренажер математики для 4–5 класу українською</title>
 <meta name="description" content="..." />
 <meta name="keywords" content="математика 4 клас, математика 5 клас, ..." />
-<meta name="author" content="MathQuest" />
+<meta name="author" content="YaKMath" />
 <meta name="robots" content="index, follow, max-image-preview:large" />
-<link rel="canonical" href="https://mathquest.com.ua/" />
+<link rel="canonical" href="https://yakmath.com.ua/" />
 
 <!-- Open Graph (для Facebook, LinkedIn, Viber) -->
 <meta property="og:type" content="website" />
 <meta property="og:title" content="..." />
 <meta property="og:description" content="..." />
-<meta property="og:image" content="https://mathquest.com.ua/og-image.svg" />
-<meta property="og:url" content="https://mathquest.com.ua/" />
+<meta property="og:image" content="https://yakmath.com.ua/og-image.svg" />
+<meta property="og:url" content="https://yakmath.com.ua/" />
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image" />
@@ -153,7 +153,7 @@
    ```json
    {
      "@type": "WebApplication",
-     "name": "MathQuest",
+     "name": "YaKMath",
      "description": "...",
      "applicationCategory": "EducationalApplication",
      "isAccessibleForFree": true,
@@ -179,7 +179,7 @@ User-agent: *
 Allow: /
 
 # Sitemap для кращої індексації
-Sitemap: https://mathquest.com.ua/sitemap.xml
+Sitemap: https://yakmath.com.ua/sitemap.xml
 ```
 
 ### `sitemap.xml`
@@ -188,13 +188,13 @@ Sitemap: https://mathquest.com.ua/sitemap.xml
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://mathquest.com.ua/</loc>
+    <loc>https://yakmath.com.ua/</loc>
     <lastmod>2026-06-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://mathquest.com.ua/app</loc>
+    <loc>https://yakmath.com.ua/app</loc>
     <lastmod>2026-06-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
@@ -205,7 +205,7 @@ Sitemap: https://mathquest.com.ua/sitemap.xml
 ### Open Graph образка (`public/og-image.svg`)
 
 SVelte-образка (1200×630 px) із:
-- Логотипом MathQuest
+- Логотипом YaKMath
 - Заголовком
 - Короткою описом
 - Брендовими кольорами (фіолетовий/рожевий)

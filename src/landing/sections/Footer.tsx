@@ -14,7 +14,7 @@ export function LandingFooter() {
                 🧠
               </span>
               <span className="font-extrabold text-lg tracking-tight">
-                Math<span className="text-brand-600">Quest</span>
+                YaK<span className="text-brand-600">Math</span>
               </span>
             </div>
             <p className="mt-3 text-sm text-slate-600 max-w-sm leading-relaxed">
@@ -78,7 +78,21 @@ export function LandingFooter() {
         </div>
 
         <div className="mt-10 pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
-          <div>© {year} MathQuest. Створено в Україні з любов’ю до математики.</div>
+          <div className="flex flex-col gap-1.5">
+            <div>© {year} YaKMath. Створено в Україні з любов’ю до математики.</div>
+            <div>
+              Партнер:{' '}
+              <a
+                href="https://yakls.com.ua/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-semibold text-slate-600 hover:text-brand-600 underline decoration-slate-300 hover:decoration-brand-600 transition"
+              >
+                YaK Language School
+              </a>{' '}
+              — онлайн-курси іноземних мов для дітей та дорослих.
+            </div>
+          </div>
           <div className="flex items-center gap-4">
             <span>Без реклами</span>
             <span>·</span>

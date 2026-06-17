@@ -32,7 +32,7 @@ export function LandingHeader() {
     >
       <div className="mx-auto max-w-6xl px-5 sm:px-8">
         <div className="h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2 group" aria-label="MathQuest — головна">
+          <Link to="/" className="flex items-center gap-2 group" aria-label="YaKMath — головна">
             <span
               className="w-9 h-9 rounded-xl grid place-items-center text-xl shadow-sm
                 bg-gradient-to-br from-brand-500 to-fuchsia-500 text-white"
@@ -41,7 +41,7 @@ export function LandingHeader() {
               🧠
             </span>
             <span className="font-extrabold text-lg tracking-tight">
-              Math<span className="text-brand-600">Quest</span>
+              YaK<span className="text-brand-600">Math</span>
             </span>
           </Link>
 

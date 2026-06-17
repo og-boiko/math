@@ -1,79 +1,79 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://mathquest.com.ua/</loc>
+    <loc>https://yakmath.com.ua/</loc>
     <lastmod>2026-06-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://mathquest.com.ua/app/welcome</loc>
+    <loc>https://yakmath.com.ua/app/welcome</loc>
     <lastmod>2026-06-16</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://mathquest.com.ua/app/leaderboard</loc>
+    <loc>https://yakmath.com.ua/app/leaderboard</loc>
     <lastmod>2026-06-16</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://mathquest.com.ua/topics/oral</loc>
+    <loc>https://yakmath.com.ua/topics/oral</loc>
     <lastmod>2026-06-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://mathquest.com.ua/topics/column</loc>
+    <loc>https://yakmath.com.ua/topics/column</loc>
     <lastmod>2026-06-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://mathquest.com.ua/topics/order</loc>
+    <loc>https://yakmath.com.ua/topics/order</loc>
     <lastmod>2026-06-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://mathquest.com.ua/topics/fractions</loc>
+    <loc>https://yakmath.com.ua/topics/fractions</loc>
     <lastmod>2026-06-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://mathquest.com.ua/topics/decimals</loc>
+    <loc>https://yakmath.com.ua/topics/decimals</loc>
     <lastmod>2026-06-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://mathquest.com.ua/topics/word</loc>
+    <loc>https://yakmath.com.ua/topics/word</loc>
     <lastmod>2026-06-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://mathquest.com.ua/topics/units</loc>
+    <loc>https://yakmath.com.ua/topics/units</loc>
     <lastmod>2026-06-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://mathquest.com.ua/topics/geometry</loc>
+    <loc>https://yakmath.com.ua/topics/geometry</loc>
     <lastmod>2026-06-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://mathquest.com.ua/topics/logic</loc>
+    <loc>https://yakmath.com.ua/topics/logic</loc>
     <lastmod>2026-06-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://mathquest.com.ua/topics/equations</loc>
+    <loc>https://yakmath.com.ua/topics/equations</loc>
     <lastmod>2026-06-17</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>

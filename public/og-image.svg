@@ -30,7 +30,7 @@
           font-size="60" fill="white">🧠</text>
   </g>
   <text x="210" y="148" font-family="Nunito, system-ui, sans-serif" font-weight="900"
-        font-size="56" fill="white">MathQuest</text>
+        font-size="56" fill="white">YaKMath</text>
 
   <!-- Головний заголовок -->
   <text x="80" y="320" font-family="Nunito, system-ui, sans-serif" font-weight="900"

@@ -331,9 +331,19 @@ export const wordJointWork: Generator = {
         : difficulty === 3
           ? [...easyPairs, ...hardPairs.slice(0, 4)]
           : hardPairs;
-    const [t1, t2] = randChoice(pool);
-    const together = (t1 * t2) / (t1 + t2);
-    if (!Number.isInteger(together)) return wordJointWork.generate(difficulty);
+
+    // Шукаємо пару з цілою спільною роботою. Усі пари в pool підібрані саме
+    // так, але про всяк випадок — обмежений цикл замість рекурсії.
+    let t1 = 4, t2 = 4, together = 2;
+    for (let attempt = 0; attempt < 8; attempt++) {
+      const pick = randChoice(pool);
+      const cand = (pick[0] * pick[1]) / (pick[0] + pick[1]);
+      if (Number.isInteger(cand)) {
+        [t1, t2] = pick;
+        together = cand;
+        break;
+      }
+    }
 
     const scenarios = [
       `Майстер виконує роботу за ${t1} год, а учень — за ${t2} год. За скільки годин вони виконають цю роботу разом?`,

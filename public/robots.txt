@@ -1,0 +1,11 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+# Внутрішні робочі сторінки додатку індексувати немає сенсу —
+# вони динамічні і вимагають профілю користувача.
+Disallow: /app/task
+Disallow: /app/results
+Disallow: /app/settings
+Disallow: /app/profile
+
+Sitemap: https://mathquest.com.ua/sitemap.xml

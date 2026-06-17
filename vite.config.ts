@@ -9,7 +9,15 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       devOptions: { enabled: false },
-      includeAssets: ['favicon.svg', 'icon-192.svg', 'icon-512.svg', 'icon-maskable-512.svg'],
+      includeAssets: [
+        'favicon.svg',
+        'icon-192.svg',
+        'icon-512.svg',
+        'icon-maskable-512.svg',
+        'og-image.svg',
+        'robots.txt',
+        'sitemap.xml',
+      ],
       manifest: {
         name: 'MathQuest — тренажер математики',
         short_name: 'MathQuest',
@@ -19,7 +27,7 @@ export default defineConfig({
         background_color: '#f8fafc',
         display: 'standalone',
         orientation: 'portrait',
-        start_url: '/',
+        start_url: '/app',
         scope: '/',
         icons: [
           { src: '/icon-192.svg', sizes: '192x192', type: 'image/svg+xml', purpose: 'any' },

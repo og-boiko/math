@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from 'react';
+import { lazy, Suspense, useEffect, type ReactNode } from 'react';
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { useProfileStore } from '@/store/profile';
 import { setSoundsEnabled } from '@/lib/sounds';
@@ -18,6 +18,10 @@ import { WorldMap } from '@/pages/WorldMap';
 import { Leaderboard } from '@/pages/Leaderboard';
 import { AchievementToast } from '@/components/AchievementToast';
 
+const Landing = lazy(() =>
+  import('@/landing/Landing').then((m) => ({ default: m.Landing })),
+);
+
 function RequireProfile({ children }: { children: ReactNode }) {
   const profile = useProfileStore((s) => s.profile);
   if (!profile?.name) return <Navigate to="/welcome" replace />;
@@ -33,33 +37,145 @@ function ScrollToTop() {
   return null;
 }
 
-export function App() {
-  const soundsEnabled = useProfileStore((s) => s.profile?.settings.soundsEnabled);
-  useEffect(() => {
-    setSoundsEnabled(soundsEnabled ?? true);
-  }, [soundsEnabled]);
-
+function AppRoutes() {
   return (
-    <BrowserRouter>
+    <>
       <ScrollToTop />
       <AchievementToast />
       <Routes>
         <Route path="/welcome" element={<Welcome />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/theme-select" element={<ThemeSelect />} />
-        <Route path="/" element={<RequireProfile><Hub /></RequireProfile>} />
-        <Route path="/practice" element={<RequireProfile><Practice /></RequireProfile>} />
-        <Route path="/exams" element={<RequireProfile><Exams /></RequireProfile>} />
-        <Route path="/errors" element={<RequireProfile><Errors /></RequireProfile>} />
-        <Route path="/task" element={<RequireProfile><TaskPage /></RequireProfile>} />
-        <Route path="/results" element={<RequireProfile><Results /></RequireProfile>} />
-        <Route path="/settings" element={<RequireProfile><Settings /></RequireProfile>} />
-        <Route path="/profile" element={<RequireProfile><Profile /></RequireProfile>} />
-        <Route path="/calendar" element={<RequireProfile><Calendar /></RequireProfile>} />
-        <Route path="/map" element={<RequireProfile><WorldMap /></RequireProfile>} />
-        <Route path="/leaderboard" element={<RequireProfile><Leaderboard /></RequireProfile>} />
+        <Route
+          path="/"
+          element={
+            <RequireProfile>
+              <Hub />
+            </RequireProfile>
+          }
+        />
+        <Route
+          path="/practice"
+          element={
+            <RequireProfile>
+              <Practice />
+            </RequireProfile>
+          }
+        />
+        <Route
+          path="/exams"
+          element={
+            <RequireProfile>
+              <Exams />
+            </RequireProfile>
+          }
+        />
+        <Route
+          path="/errors"
+          element={
+            <RequireProfile>
+              <Errors />
+            </RequireProfile>
+          }
+        />
+        <Route
+          path="/task"
+          element={
+            <RequireProfile>
+              <TaskPage />
+            </RequireProfile>
+          }
+        />
+        <Route
+          path="/results"
+          element={
+            <RequireProfile>
+              <Results />
+            </RequireProfile>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <RequireProfile>
+              <Settings />
+            </RequireProfile>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <RequireProfile>
+              <Profile />
+            </RequireProfile>
+          }
+        />
+        <Route
+          path="/calendar"
+          element={
+            <RequireProfile>
+              <Calendar />
+            </RequireProfile>
+          }
+        />
+        <Route
+          path="/map"
+          element={
+            <RequireProfile>
+              <WorldMap />
+            </RequireProfile>
+          }
+        />
+        <Route
+          path="/leaderboard"
+          element={
+            <RequireProfile>
+              <Leaderboard />
+            </RequireProfile>
+          }
+        />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+    </>
+  );
+}
+
+export function App() {
+  const soundsEnabled = useProfileStore((s) => s.profile?.settings.soundsEnabled);
+  useEffect(() => {
+    setSoundsEnabled(soundsEnabled ?? true);
+  }, [soundsEnabled]);
+
+  const isApp =
+    typeof window !== 'undefined' && window.location.pathname.startsWith('/app');
+
+  if (isApp) {
+    return (
+      <BrowserRouter basename="/app">
+        <AppRoutes />
+      </BrowserRouter>
+    );
+  }
+
+  return (
+    <BrowserRouter>
+      <Suspense fallback={<LandingFallback />}>
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
     </BrowserRouter>
+  );
+}
+
+function LandingFallback() {
+  return (
+    <div className="min-h-screen grid place-items-center bg-white">
+      <div className="text-center">
+        <div className="text-3xl mb-2">🧠</div>
+        <div className="text-slate-500 text-sm">Завантажуємо…</div>
+      </div>
+    </div>
   );
 }

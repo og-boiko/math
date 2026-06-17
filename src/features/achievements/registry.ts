@@ -143,6 +143,20 @@ export const achievements: Achievement[] = [
     description: 'Виправити 10 помилок',
     check: (p) => (p.flags?.errorsResolved ?? 0) >= 10,
   },
+  {
+    id: 'workbench-engineer',
+    emoji: '🧰',
+    title: 'Інженер',
+    description: 'Скористайся робочим столом 10 разів',
+    check: (p) => (p.flags?.workbenchUses ?? 0) >= 10,
+  },
+  {
+    id: 'workbench-thinker',
+    emoji: '📝',
+    title: 'Не довіряй голові',
+    description: 'Розв\u2019яжи 50 задач із робочим столом',
+    check: (p) => (p.flags?.workbenchCorrectAnswers ?? 0) >= 50,
+  },
 ];
 
 function totalAttempts(p: Profile): number {

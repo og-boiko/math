@@ -10,6 +10,7 @@ import {
   LogOut,
   Cloud,
   Trophy,
+  Wrench,
 } from 'lucide-react';
 import { useProfileStore } from '@/store/profile';
 import { themePacks } from '@/features/themes/registry';
@@ -44,6 +45,11 @@ export function Settings() {
     updateSettings({ soundsEnabled: next });
     setSoundsEnabled(next);
     if (next) playSound('correct');
+  };
+
+  const toggleWorkbench = () => {
+    const next = !(profile.settings.workbenchEnabled ?? true);
+    updateSettings({ workbenchEnabled: next });
   };
 
   const handleReset = () => {
@@ -102,6 +108,37 @@ export function Settings() {
           >
             <span
               className={`absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow transition-transform ${profile.settings.soundsEnabled ? 'translate-x-5' : ''}`}
+            />
+          </button>
+        </div>
+      </Card>
+
+      {/* Робочий стіл */}
+      <Card className="mb-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Wrench
+              size={22}
+              className={
+                (profile.settings.workbenchEnabled ?? true)
+                  ? 'text-brand-600'
+                  : 'text-slate-400'
+              }
+            />
+            <div>
+              <div className="font-bold">Робочий стіл</div>
+              <div className="text-xs text-slate-500">
+                Калькулятор, сітка стовпчиком та чернетка біля задачі
+              </div>
+            </div>
+          </div>
+          <button
+            onClick={toggleWorkbench}
+            className={`relative w-12 h-7 rounded-full transition ${(profile.settings.workbenchEnabled ?? true) ? 'bg-brand-600' : 'bg-slate-300'}`}
+            aria-label="toggle workbench"
+          >
+            <span
+              className={`absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow transition-transform ${(profile.settings.workbenchEnabled ?? true) ? 'translate-x-5' : ''}`}
             />
           </button>
         </div>

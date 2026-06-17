@@ -2,27 +2,108 @@
 <html lang="uk">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#7c3aed" />
+    <meta name="color-scheme" content="light" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <title>MathQuest — тренажер математики для 4–5 класу українською</title>
+    <meta name="description" content="Інтерактивний тренажер математики для дітей 4–5 класу. 10 тем за програмою НУШ, адаптивна складність, журнал помилок, робочий стіл і ачивки. Безкоштовно, без реклами, працює офлайн." />
+    <meta name="keywords" content="математика 4 клас, математика 5 клас, тренажер математики, задачі онлайн, НУШ математика, додавання стовпчиком, дроби, рівняння, тести з математики, дитячий тренажер українською" />
+    <meta name="author" content="MathQuest" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link rel="canonical" href="https://mathquest.com.ua/" />
+    <link rel="alternate" hreflang="uk" href="https://mathquest.com.ua/" />
+    <link rel="alternate" hreflang="x-default" href="https://mathquest.com.ua/" />
+
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/icon-192.svg" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
-    />
-    <meta name="theme-color" content="#7c3aed" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="MathQuest" />
-    <title>MathQuest — тренажер математики</title>
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="MathQuest" />
+    <meta property="og:locale" content="uk_UA" />
+    <meta property="og:url" content="https://mathquest.com.ua/" />
+    <meta property="og:title" content="MathQuest — тренажер математики для 4–5 класу українською" />
+    <meta property="og:description" content="10 тем за НУШ, адаптивна складність, ачивки. Безкоштовно і без реклами." />
+    <meta property="og:image" content="https://mathquest.com.ua/og-image.svg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="MathQuest — тренажер математики" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="MathQuest — тренажер математики для 4–5 класу" />
+    <meta name="twitter:description" content="10 тем за НУШ, адаптивна складність, ачивки. Безкоштовно і без реклами." />
+    <meta name="twitter:image" content="https://mathquest.com.ua/og-image.svg" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&display=swap"
-      rel="stylesheet"
-    />
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&display=swap" onload="this.rel='stylesheet'" />
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&display=swap" />
+    </noscript>
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "MathQuest",
+        "url": "https://mathquest.com.ua/",
+        "description": "Інтерактивний тренажер математики для дітей 4–5 класу українською мовою.",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Any",
+        "inLanguage": "uk",
+        "isAccessibleForFree": true,
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "UAH" },
+        "audience": { "@type": "EducationalAudience", "educationalRole": "student", "audienceType": "Учні 4–5 класу" },
+        "creator": { "@type": "Organization", "name": "MathQuest" }
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          { "@type": "Question", "name": "Це справді безкоштовно?", "acceptedAnswer": { "@type": "Answer", "text": "Так. Усі задачі, теми, ачивки і робочий стіл доступні безкоштовно. Без реклами та без преміуму." } },
+          { "@type": "Question", "name": "Чи потрібна реєстрація?", "acceptedAnswer": { "@type": "Answer", "text": "Ні. Можна почати одразу — локальний профіль збережеться у браузері." } },
+          { "@type": "Question", "name": "Чи це працює офлайн?", "acceptedAnswer": { "@type": "Answer", "text": "Так. MathQuest — PWA, можна встановити на телефон і користуватися без інтернету." } },
+          { "@type": "Question", "name": "Для якого віку?", "acceptedAnswer": { "@type": "Answer", "text": "Оптимально 9–11 років (4–5 клас НУШ)." } }
+        ]
+      }
+    </script>
+
+    <style>
+      :root { color-scheme: light; }
+      html, body { margin: 0; padding: 0; background: #ffffff; }
+      body { font-family: Nunito, system-ui, -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
+      .ssr-fallback { min-height: 100vh; display: grid; place-items: center; padding: 24px; color: #475569; text-align: center; }
+      .ssr-fallback h1 { font-size: 32px; margin: 0 0 8px; color: #0f172a; font-weight: 900; letter-spacing: -0.02em; }
+      .ssr-fallback p { margin: 0; max-width: 36rem; line-height: 1.55; }
+      .ssr-fallback .logo { width: 56px; height: 56px; border-radius: 14px; background: linear-gradient(135deg, #8b5cf6, #d946ef); color: white; display: grid; place-items: center; font-size: 28px; margin: 0 auto 16px; box-shadow: 0 8px 24px rgba(124, 58, 237, 0.25); }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <noscript>
+        <div class="ssr-fallback">
+          <div>
+            <div class="logo">🧠</div>
+            <h1>MathQuest — тренажер математики</h1>
+            <p>Інтерактивний тренажер математики для учнів 4–5 класу українською мовою. Щоб користуватися, увімкніть JavaScript у вашому браузері.</p>
+          </div>
+        </div>
+      </noscript>
+      <div class="ssr-fallback" id="ssr-fallback">
+        <div>
+          <div class="logo">🧠</div>
+          <h1>MathQuest</h1>
+          <p>Адаптивний тренажер математики для 4–5 класу. Завантажуємо…</p>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

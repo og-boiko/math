@@ -239,11 +239,14 @@ export const geometryAngles: Generator = {
       };
     }
     if (difficulty === 4) {
-      // сума кутів трикутника
-      const a = randInt(30, 80);
-      const b = randInt(30, 80);
-      const c = 180 - a - b;
-      if (c < 10 || c > 120) return geometryAngles.generate(4);
+      // Сума кутів трикутника. Підбираємо a і b так, щоб c = 180 − a − b
+      // попав у [10..120]. Робимо це детерміновано: спочатку обираємо c,
+      // потім a у безпечному діапазоні, b = 180 − a − c. Без рекурсії.
+      const c = randInt(20, 110);
+      const aMin = Math.max(20, 180 - c - 120);
+      const aMax = Math.min(120, 180 - c - 20);
+      const a = randInt(aMin, aMax);
+      const b = 180 - a - c;
       return {
         id: uid('geo-ang-'),
         topicId: 'geometry',
@@ -257,10 +260,10 @@ export const geometryAngles: Generator = {
         estimatedSec: 25,
       };
     }
-    // 5: рівнобедрений
-    const apex = randInt(20, 140);
+    // 5: рівнобедрений. Щоб основа була цілою, (180 − apex) має бути парним.
+    // Обираємо apex з кроком 2 — гарантовано ціле, без рекурсії.
+    const apex = randInt(10, 70) * 2; // 20..140, парне
     const base = (180 - apex) / 2;
-    if (!Number.isInteger(base)) return geometryAngles.generate(5);
     return {
       id: uid('geo-ang-'),
       topicId: 'geometry',
@@ -323,16 +326,30 @@ export const geometryRectangleSameArea: Generator = {
       12, 18, 20, 24, 28, 30, 36, 40, 42, 48, 54, 56, 60, 64, 72,
       80, 84, 90, 96, 100, 120,
     ];
-    const s = randChoice(
-      difficulty <= 2 ? candidates.slice(0, 8) : difficulty === 3 ? candidates.slice(4, 14) : candidates,
-    );
+    const pool =
+      difficulty <= 2 ? candidates.slice(0, 8) : difficulty === 3 ? candidates.slice(4, 14) : candidates;
 
-    // Усі пари дільників (a ≤ b)
-    const pairs: Array<[number, number]> = [];
-    for (let i = 1; i * i <= s; i++) {
-      if (s % i === 0) pairs.push([i, s / i]);
+    // Шукаємо число з ≥ 2 парами дільників (a ≤ b). Усі числа в `candidates`
+    // підібрані так, що вони складені, тому така пара завжди знайдеться.
+    // Робимо до 8 спроб — і fallback на гарантовано робочий 12 = 2×6 = 3×4.
+    let s = 12;
+    let pairs: Array<[number, number]> = [];
+    for (let attempt = 0; attempt < 8; attempt++) {
+      const candidate = randChoice(pool);
+      const cp: Array<[number, number]> = [];
+      for (let i = 1; i * i <= candidate; i++) {
+        if (candidate % i === 0) cp.push([i, candidate / i]);
+      }
+      if (cp.length >= 2) {
+        s = candidate;
+        pairs = cp;
+        break;
+      }
     }
-    if (pairs.length < 2) return geometryRectangleSameArea.generate(difficulty);
+    if (pairs.length < 2) {
+      s = 12;
+      pairs = [[1, 12], [2, 6], [3, 4]];
+    }
 
     // Один варіант показуємо в умові, інші — приймаємо як відповідь
     const given = pairs[Math.floor(pairs.length / 2)];

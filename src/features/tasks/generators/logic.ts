@@ -131,12 +131,17 @@ export const logicAge: Generator = {
       };
     }
     // 4-5: коли тато буде в k разів старший
+    // Рівняння: dad + x = k · (son + x)  →  x = (dad − k·son) / (k − 1).
+    // Підбираємо параметри так, щоб x був цілим невід'ємним (інакше задача
+    // не має дитячого розв'язку). Раніше тут була рекурсія+downgrade рівня;
+    // тепер — детерміноване конструювання.
+    const k = 2;
+    // Беремо son так, щоб dad ≥ k·son (тато вже старший за k·son або рівний)
     const son = randInt(5, 12);
-    const dad = son * randInt(3, 5);
-    // знайти, через скільки років тато буде вдвічі старший
-    let years = 0;
-    while (dad + years !== 2 * (son + years) && years < 100) years++;
-    if (years >= 100) return logicAge.generate(2);
+    // Хочемо x ≥ 0 (момент у майбутньому) → dad ≥ k·son.
+    // Беремо dad = k·son + (k−1)·yearsAhead, де yearsAhead ∈ [3..15] — це і буде відповідь.
+    const yearsAhead = randInt(3, 15);
+    const dad = k * son + (k - 1) * yearsAhead;
     return {
       id: uid('logic-age-'),
       topicId: 'logic',
@@ -144,12 +149,12 @@ export const logicAge: Generator = {
       difficulty,
       question: `Сину ${son} років, татові ${dad}. Через скільки років тато буде вдвічі старший за сина?`,
       answerType: 'number',
-      correctAnswer: String(years),
+      correctAnswer: String(yearsAhead),
       hints: [
         'Спробуй скласти рівняння: тато + x = 2 × (син + x).',
         `${dad} + x = 2 × (${son} + x) → ${dad} − 2 × ${son} = x → x = ?`,
       ],
-      solution: `${dad} − 2 × ${son} = ${dad - 2 * son}, через ${years} років`,
+      solution: `${dad} − 2 × ${son} = ${dad - 2 * son}, через ${yearsAhead} років`,
       estimatedSec: 60,
     };
   },
@@ -211,7 +216,9 @@ export const logicCryptarithm: Generator = {
   topicId: 'logic',
   subtopic: 'Числові ребуси',
   generate(_difficulty: Difficulty): Task {
-    // А + А = БВ (двозначне), А — цифра від 5 до 9 (бо сума ≥ 10)
+    // А + А = БВ (двозначне), А — цифра від 5 до 9 (бо сума ≥ 10).
+    // У запитанні мусимо показати БВ — інакше А не визначається однозначно
+    // (підходить будь-яке з 5..9), і відповідь дитини не з чим порівнювати.
     const a = randInt(5, 9);
     const sum = a + a;
     return {
@@ -219,14 +226,14 @@ export const logicCryptarithm: Generator = {
       topicId: 'logic',
       subtopic: 'Числові ребуси',
       difficulty: _difficulty,
-      question: `У рівності А + А = БВ кожна літера — цифра. Чому дорівнює А?`,
+      question: `У рівності А + А = БВ всі літери — цифри, а БВ = ${sum}. Чому дорівнює А?`,
       answerType: 'number',
       correctAnswer: String(a),
       hints: [
         'А + А = БВ — двозначне, отже А ≥ 5.',
-        `Спробуй А = 5, 6, 7, 8, 9. У нашій задачі БВ = ${sum}.`,
+        `БВ = ${sum}. Знайди таке А, щоб А + А дорівнювало ${sum}.`,
       ],
-      solution: `А = ${a}, бо ${a} + ${a} = ${sum} (БВ = ${sum})`,
+      solution: `А = ${a}, бо ${a} + ${a} = ${sum}`,
       estimatedSec: 60,
     };
   },

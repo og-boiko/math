@@ -81,7 +81,7 @@ export const oralMultiplication: Generator = {
     return {
       id: uid('oral-mul-'),
       topicId: 'oral',
-      subtopic: 'Множення',
+      subtopic: 'Таблиця множення',
       difficulty,
       question: `${a} × ${b} = ?`,
       answerType: 'number',

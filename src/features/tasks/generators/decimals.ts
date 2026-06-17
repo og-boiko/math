@@ -20,11 +20,25 @@ export const decimalRead: Generator = {
       const ones = ['', 'одна', 'дві', 'три', 'чотири', "п'ять", 'шість', 'сім', 'вісім', "дев'ять"];
       const tens = ['', '', 'двадцять', 'тридцять', 'сорок', "п'ятдесят", 'шістдесят', 'сімдесят', 'вісімдесят', "дев'яносто"];
       const teens = ['десять', 'одинадцять', 'дванадцять', 'тринадцять', 'чотирнадцять', "п'ятнадцять", 'шістнадцять', 'сімнадцять', 'вісімнадцять', "дев'ятнадцять"];
-      if (n < 10) return ones[n];
-      if (n < 20) return teens[n - 10];
-      const t = Math.floor(n / 10);
-      const o = n % 10;
-      return o === 0 ? tens[t] : `${tens[t]} ${ones[o]}`;
+      const hundreds = [
+        '', 'сто', 'двісті', 'триста', 'чотириста',
+        "п'ятсот", 'шістсот', 'сімсот', 'вісімсот', "дев'ятсот",
+      ];
+      const under100 = (m: number): string => {
+        if (m < 10) return ones[m];
+        if (m < 20) return teens[m - 10];
+        const t = Math.floor(m / 10);
+        const o = m % 10;
+        return o === 0 ? tens[t] : `${tens[t]} ${ones[o]}`;
+      };
+      if (n < 100) return under100(n);
+      if (n < 1000) {
+        const h = Math.floor(n / 100);
+        const r = n % 100;
+        return r === 0 ? hundreds[h] : `${hundreds[h]} ${under100(r)}`;
+      }
+      // Для тисячних розрядів дроби максимум 999 — сюди не доходимо.
+      return String(n);
     };
 
     const fracName =

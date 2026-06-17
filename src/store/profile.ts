@@ -143,6 +143,12 @@ interface ProfileState {
   updateDailyGoal: (goal: DailyGoal) => void;
   consumePendingAchievements: () => string[];
   resetProfile: () => void;
+  /**
+   * Зафіксувати, що дитина скористалась робочим столом для цієї задачі.
+   * `correct` — чи відповіла правильно. Викликається 1 раз на задачу
+   * (Task.tsx сам захищається від подвійного інкременту).
+   */
+  noteWorkbenchUse: (correct: boolean) => void;
   hydrateFromSnapshot: (snap: {
     child: { display_name: string; age: number; theme: string };
     stats: {
@@ -157,6 +163,36 @@ interface ProfileState {
       achievements: string[] | null;
       last_active_date: string | null;
     } | null;
+    topics?: Array<{
+      topic_id: string;
+      total_attempts: number;
+      correct: number;
+      current_difficulty: number;
+      consecutive_correct: number;
+      recent_mistakes: number;
+    }> | null;
+    activity?: Array<{
+      date: string;
+      attempts: number;
+      correct: number;
+      stars: number;
+      time_sec: number;
+    }> | null;
+    errors?: Array<{
+      id: string;
+      topic_id: string;
+      subtopic: string;
+      question: string;
+      correct_answer: string;
+      accepted_answers: string[] | null;
+      hints: string[] | null;
+      solution: string;
+      difficulty: number;
+      next_review_date: string;
+      success_streak: number;
+      review_count: number;
+      added_date: string;
+    }> | null;
   }) => void;
 }
 
@@ -374,11 +410,78 @@ export const useProfileStore = create<ProfileState>()(
         return pending;
       },
 
+      noteWorkbenchUse: (correct) =>
+        set((s) => {
+          if (!s.profile) return s;
+          const next: Profile = {
+            ...s.profile,
+            flags: {
+              ...s.profile.flags,
+              workbenchUses: (s.profile.flags.workbenchUses ?? 0) + 1,
+              workbenchCorrectAnswers:
+                (s.profile.flags.workbenchCorrectAnswers ?? 0) + (correct ? 1 : 0),
+            },
+          };
+          return { profile: applyAchievements(next) };
+        }),
+
       resetProfile: () => set({ profile: null }),
 
       hydrateFromSnapshot: (snap) =>
         set((s) => {
           const base = s.profile ?? emptyProfile(snap.child.display_name, snap.child.age);
+
+          // topics → перенести в Record<TopicId, TopicProgress>
+          const topics = { ...base.topics };
+          if (snap.topics) {
+            for (const t of snap.topics) {
+              const tid = t.topic_id as TopicId;
+              if (!TOPIC_IDS.includes(tid)) continue;
+              topics[tid] = {
+                ...topics[tid],
+                topicId: tid,
+                totalAttempts: t.total_attempts,
+                correct: t.correct,
+                currentDifficulty: Math.min(5, Math.max(1, t.current_difficulty)) as Difficulty,
+                consecutiveCorrect: t.consecutive_correct,
+                recentMistakes: t.recent_mistakes,
+              };
+            }
+          }
+
+          // activity → Record<dateKey, DailyActivity>
+          const activity = { ...base.activity };
+          if (snap.activity) {
+            for (const a of snap.activity) {
+              activity[a.date] = {
+                date: a.date,
+                attempts: a.attempts,
+                correct: a.correct,
+                stars: a.stars,
+                timeSec: a.time_sec,
+              };
+            }
+          }
+
+          // errors → ErrorQueueItem[]
+          const errorQueue: ErrorQueueItem[] = snap.errors
+            ? snap.errors.map((e) => ({
+                id: e.id,
+                topicId: e.topic_id as TopicId,
+                subtopic: e.subtopic,
+                question: e.question,
+                correctAnswer: e.correct_answer,
+                acceptedAnswers: e.accepted_answers ?? undefined,
+                hints: e.hints ?? [],
+                solution: e.solution,
+                difficulty: Math.min(5, Math.max(1, e.difficulty)) as Difficulty,
+                nextReviewDate: e.next_review_date,
+                successStreak: e.success_streak,
+                reviewCount: e.review_count,
+                addedDate: e.added_date,
+              }))
+            : base.errorQueue;
+
           const next: Profile = {
             ...base,
             name: snap.child.display_name,
@@ -392,6 +495,9 @@ export const useProfileStore = create<ProfileState>()(
             longestStreak: snap.stats?.longest_streak ?? base.longestStreak,
             achievements: snap.stats?.achievements ?? base.achievements,
             lastActiveDate: snap.stats?.last_active_date ?? base.lastActiveDate,
+            topics,
+            activity,
+            errorQueue,
           };
           return { profile: next };
         }),

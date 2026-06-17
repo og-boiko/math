@@ -10,21 +10,33 @@ export const orderNoBrackets: Generator = {
   generate(difficulty: Difficulty): Task {
     const opsCount = Math.min(2 + Math.floor(difficulty / 2), 4);
     const max = difficulty <= 2 ? 20 : difficulty <= 4 ? 50 : 100;
-    const parts: string[] = [];
-    let expr = String(randInt(2, max));
-    parts.push(expr);
-    for (let i = 0; i < opsCount; i++) {
-      const op = randChoice(['+', '-', '×']);
-      const n = randInt(2, max);
-      expr += ` ${op} ${n}`;
-      parts.push(op, String(n));
+
+    // Обмежений цикл замість рекурсії. До 8 спроб згенерувати «гарний» вираз
+    // з цілим, не надто великим результатом.
+    let expr = '';
+    let result = 0;
+    let ok = false;
+    for (let attempt = 0; attempt < 8 && !ok; attempt++) {
+      let e = String(randInt(2, max));
+      for (let i = 0; i < opsCount; i++) {
+        const op = randChoice(['+', '-', '×']);
+        const n = randInt(2, max);
+        e += ` ${op} ${n}`;
+      }
+      const jsExpr = e.replace(/×/g, '*').replace(/−/g, '-');
+      const r = evalExpression(jsExpr);
+      if (Number.isInteger(r) && Math.abs(r) <= 99999 && r >= 0) {
+        expr = e;
+        result = r;
+        ok = true;
+      }
     }
-    // обчислюємо
-    const jsExpr = expr.replace(/×/g, '*').replace(/−/g, '-');
-    const result = evalExpression(jsExpr);
-    if (!Number.isInteger(result) || Math.abs(result) > 99999) {
-      // fallback на простіший приклад
-      return orderNoBrackets.generate(1);
+    if (!ok) {
+      // Гарантований fallback: проста сума
+      const a = randInt(2, max);
+      const b = randInt(2, max);
+      expr = `${a} + ${b}`;
+      result = a + b;
     }
     return {
       id: uid('order-nb-'),
@@ -50,35 +62,49 @@ export const orderWithBrackets: Generator = {
   subtopic: 'Порядок дій з дужками',
   generate(difficulty: Difficulty): Task {
     const max = difficulty <= 2 ? 20 : 50;
-    const a = randInt(2, max);
-    const b = randInt(2, max);
-    const c = randInt(2, max);
-    const d = randInt(2, 9);
-    let expr: string;
-    let result: number;
-    if (difficulty <= 2) {
-      // (a + b) × c
+
+    // Обмежений цикл замість рекурсії. Шаблон вибирається за рівнем,
+    // а параметри підбираються до 8 разів, доки результат не пройде перевірки.
+    let expr = '';
+    let result = 0;
+    let ok = false;
+    for (let attempt = 0; attempt < 8 && !ok; attempt++) {
+      const a = randInt(2, max);
+      const b = randInt(2, max);
+      const c = randInt(2, max);
+      const d = randInt(2, 9);
+      let e: string;
+      let r: number;
+      if (difficulty <= 2) {
+        e = `(${a} + ${b}) × ${c}`;
+        r = (a + b) * c;
+      } else if (difficulty === 3) {
+        const big = Math.max(b, c);
+        const small = Math.min(b, c);
+        e = `${d} × (${big} − ${small})`;
+        r = d * (big - small);
+      } else if (difficulty === 4) {
+        const big = Math.max(c, d) + 5;
+        const small = Math.min(c, d);
+        e = `(${a} + ${b}) × (${big} − ${small})`;
+        r = (a + b) * (big - small);
+      } else {
+        e = `(${a} × ${b} − ${c}) × ${d}`;
+        r = (a * b - c) * d;
+      }
+      if (Number.isFinite(r) && r >= 0 && Math.abs(r) <= 99999) {
+        expr = e;
+        result = r;
+        ok = true;
+      }
+    }
+    if (!ok) {
+      // Гарантований fallback — найпростіша версія
+      const a = randInt(2, max);
+      const b = randInt(2, max);
+      const c = randInt(2, max);
       expr = `(${a} + ${b}) × ${c}`;
       result = (a + b) * c;
-    } else if (difficulty === 3) {
-      // a × (b - c) — гарантуємо b > c
-      const big = Math.max(b, c);
-      const small = Math.min(b, c);
-      expr = `${d} × (${big} − ${small})`;
-      result = d * (big - small);
-    } else if (difficulty === 4) {
-      // (a + b) × (c - d)
-      const big = Math.max(c, d) + 5;
-      const small = Math.min(c, d);
-      expr = `(${a} + ${b}) × (${big} − ${small})`;
-      result = (a + b) * (big - small);
-    } else {
-      // (a × b - c) × d
-      expr = `(${a} × ${b} − ${c}) × ${d}`;
-      result = (a * b - c) * d;
-    }
-    if (!Number.isFinite(result) || result < 0 || Math.abs(result) > 99999) {
-      return orderWithBrackets.generate(1);
     }
     return {
       id: uid('order-br-'),

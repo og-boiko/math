@@ -278,10 +278,28 @@ export const columnCombined: Generator = {
       },
     ];
 
-    const variant = randChoice(variants)();
-    if (!Number.isInteger(variant.result) || variant.result < 0 || variant.result > 999999) {
-      return columnCombined.generate(difficulty);
-    }
+    const variant = (() => {
+      // Обмежений цикл замість рекурсії — до 8 спроб згенерувати «гарний»
+      // варіант (цілий, у межах 0..999_999). Інакше fallback.
+      for (let attempt = 0; attempt < 8; attempt++) {
+        const v = randChoice(variants)();
+        if (Number.isInteger(v.result) && v.result >= 0 && v.result <= 999999) {
+          return v;
+        }
+      }
+      // Fallback: гарантовано безпечний шаблон N + (a − b) · c з малими числами
+      const a = 20, b = 5, c = 3, n = 100;
+      const result = n + (a - b) * c;
+      return {
+        expr: `${n} + (${a} − ${b}) × ${c}`,
+        result,
+        steps: [
+          `Спочатку дужки: ${a} − ${b} = ${a - b}.`,
+          `Потім множення: ${a - b} × ${c} = ${(a - b) * c}.`,
+          `Нарешті додавання: ${n} + ${(a - b) * c} = ${result}.`,
+        ],
+      };
+    })();
 
     return {
       id: uid('col-comb-'),

@@ -53,6 +53,10 @@ export interface ProfileFlags {
   hadFastSession?: boolean;
   highestExamGrade?: number;
   errorsResolved?: number;
+  /** Скільки разів дитина відкривала робочий стіл (workbench) і користувалася ним. */
+  workbenchUses?: number;
+  /** Скільки задач було розв'язано правильно з використанням робочого столу. */
+  workbenchCorrectAnswers?: number;
 }
 
 export interface DailyActivity {
@@ -66,6 +70,8 @@ export interface DailyActivity {
 export interface ProfileSettings {
   soundsEnabled: boolean;
   parentPinHash?: string;
+  /** Чи показувати кнопку «🧰 Робочий стіл» на екрані задачі. Дефолт: true. */
+  workbenchEnabled?: boolean;
 }
 
 export interface DailyGoal {

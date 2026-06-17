@@ -1,97 +1,130 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Check, X } from 'lucide-react';
-import { useSessionStore } from '@/store/session';
+import clsx from 'clsx';
+import { Check, X, Wrench } from 'lucide-react';
 import { useProfileStore } from '@/store/profile';
-import { HintPanel } from '@/components/HintPanel';
-import { ProgressBar } from '@/components/ProgressBar';
+import { useSessionStore, type Stars } from '@/store/session';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { ProgressBar } from '@/components/ProgressBar';
+import { HintPanel } from '@/components/HintPanel';
+import { Workbench } from '@/components/workbench/Workbench';
+import {
+  clearTaskState,
+  getTaskState,
+  hasContent,
+} from '@/components/workbench/workbenchStore';
+import { checkAnswer } from '@/lib/format';
 import { playSound, unlockAudio } from '@/lib/sounds';
-import { normalizeAnswer as normalize } from '@/lib/format';
 
-type Feedback = 'idle' | 'correct' | 'wrong';
-
-function isAnswerCorrect(input: string, correct: string, accepted?: string[]): boolean {
-  const n = normalize(input);
-  if (!n) return false;
-  if (normalize(correct) === n) return true;
-  if (accepted?.some((a) => normalize(a) === n)) return true;
-  return false;
-}
-
-function starsFor(hintLevel: number, attempts: number, solutionShown: boolean): 0 | 1 | 2 | 3 {
-  if (solutionShown) return 0;
-  if (attempts > 1) return 1;
-  if (hintLevel > 0) return 2;
-  return 3;
-}
+type Status = 'idle' | 'wrong' | 'correct' | 'revealed';
 
 export function TaskPage() {
   const navigate = useNavigate();
-  const { tasks, index, mode, reviewIds, recordAttempt, next, reset } = useSessionStore();
+  const { tasks, index, recordAttempt, next, topicId, mode, examTitle, reviewIds } =
+    useSessionStore();
   const awardForAnswer = useProfileStore((s) => s.awardForAnswer);
   const addError = useProfileStore((s) => s.addError);
   const reviewError = useProfileStore((s) => s.reviewError);
-
+  const noteWorkbenchUse = useProfileStore((s) => s.noteWorkbenchUse);
+  const workbenchEnabled =
+    useProfileStore((s) => s.profile?.settings.workbenchEnabled) ?? true;
   const task = tasks[index];
-  const total = tasks.length;
   const isExam = mode === 'exam';
   const isReview = mode === 'review';
 
-  const [value, setValue] = useState('');
+  const [answer, setAnswer] = useState('');
+  const [status, setStatus] = useState<Status>('idle');
   const [hintLevel, setHintLevel] = useState(0);
   const [solutionShown, setSolutionShown] = useState(false);
   const [attempts, setAttempts] = useState(0);
-  const [feedback, setFeedback] = useState<Feedback>('idle');
-  const [recorded, setRecorded] = useState(false);
+  const [workbenchOpen, setWorkbenchOpen] = useState(false);
+  const [workbenchTouched, setWorkbenchTouched] = useState(false);
   const startedAt = useRef<number>(Date.now());
-  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    setValue('');
+    if (!tasks.length) {
+      navigate('/');
+    } else if (!topicId && mode === 'practice') {
+      navigate('/practice');
+    }
+  }, [tasks.length, topicId, mode, navigate]);
+
+  useEffect(() => {
+    setAnswer('');
+    setStatus('idle');
     setHintLevel(0);
     setSolutionShown(false);
     setAttempts(0);
-    setFeedback('idle');
-    setRecorded(false);
+    setWorkbenchOpen(false);
+    setWorkbenchTouched(task ? hasContent(getTaskState(task.id)) : false);
     startedAt.current = Date.now();
-    setTimeout(() => inputRef.current?.focus(), 50);
-  }, [index]);
-
-  useEffect(() => {
-    if (!task) navigate('/');
-  }, [task, navigate]);
+  }, [index, task]);
 
   if (!task) return null;
 
-  const timeSec = () => Math.max(1, Math.round((Date.now() - startedAt.current) / 1000));
+  const computeStars = (): Stars => {
+    if (status !== 'correct') return 0;
+    if (attempts === 1 && hintLevel === 0) return 3;
+    if (hintLevel <= 1 && attempts <= 2) return 2;
+    return 1;
+  };
 
-  const finalize = (isCorrect: boolean, stars: 0 | 1 | 2 | 3) => {
-    if (recorded) return;
-    setRecorded(true);
+  const submit = (overrideAnswer?: string) => {
+    unlockAudio();
+    const submitted = (overrideAnswer ?? answer).trim();
+    if (!submitted) return;
+    const newAttempts = attempts + 1;
+    setAttempts(newAttempts);
 
+    const accepted = task.acceptedAnswers ?? [task.correctAnswer];
+    const isCorrect = accepted.some((a) => checkAnswer(submitted, a));
+
+    if (isCorrect) {
+      setStatus('correct');
+      playSound('correct');
+    } else if (isExam) {
+      setStatus('revealed');
+      setSolutionShown(true);
+      playSound('wrong');
+    } else if (newAttempts >= 3) {
+      setStatus('revealed');
+      setHintLevel(task.hints.length);
+      setSolutionShown(true);
+      playSound('wrong');
+    } else {
+      setStatus('wrong');
+      playSound('wrong');
+    }
+  };
+
+  const proceed = () => {
+    const timeSec = Math.round((Date.now() - startedAt.current) / 1000);
+    const stars = computeStars();
+    const isCorrect = status === 'correct';
     recordAttempt({
       taskId: task.id,
       isCorrect,
       stars,
       hintLevel,
-      timeSec: timeSec(),
-      attempts: Math.max(attempts, 1),
+      timeSec,
+      attempts,
     });
 
-    // У режимі іспиту не оновлюємо topic-stat (щоб контрольна не впливала на складність)
-    if (!isExam && !isReview) {
-      awardForAnswer({
-        topicId: task.topicId,
-        correct: isCorrect,
-        stars,
-        timeSec: timeSec(),
-      });
+    const used = hasContent(getTaskState(task.id));
+    if (used) {
+      noteWorkbenchUse(isCorrect);
+    }
+
+    if (isReview) {
+      const reviewId = reviewIds?.[index];
+      if (reviewId) reviewError(reviewId, isCorrect);
+    } else if (topicId && !isExam) {
+      awardForAnswer({ topicId, correct: isCorrect, stars, timeSec });
       if (!isCorrect) {
         addError({
-          id: `${task.id}-${Date.now()}`,
-          topicId: task.topicId,
+          id: task.id,
+          topicId,
           subtopic: task.subtopic,
           question: task.question,
           correctAnswer: task.correctAnswer,
@@ -103,190 +136,187 @@ export function TaskPage() {
       }
     }
 
-    if (isReview && reviewIds) {
-      const id = reviewIds[index];
-      if (id) reviewError(id, isCorrect);
-    }
-  };
+    clearTaskState(task.id);
 
-  const goNext = () => {
-    if (index + 1 >= total) {
+    if (index + 1 >= tasks.length) {
       navigate('/results');
     } else {
       next();
     }
   };
 
-  const submit = () => {
-    unlockAudio();
-    if (feedback === 'correct') {
-      goNext();
-      return;
-    }
-    if (!value.trim()) return;
-    const correct = isAnswerCorrect(value, task.correctAnswer, task.acceptedAnswers);
-    setAttempts((a) => a + 1);
-    if (correct) {
-      const stars = starsFor(hintLevel, attempts + 1, solutionShown);
-      setFeedback('correct');
-      playSound('correct');
-      finalize(true, stars);
-    } else {
-      setFeedback('wrong');
-      playSound('wrong');
-      // У режимі іспиту — одна спроба
-      if (isExam) {
-        finalize(false, 0);
-        setTimeout(() => goNext(), 600);
-      } else {
-        // Після 2-ї помилки — авто-фіналізація з 0 зірок
-        if (attempts + 1 >= 2 && !solutionShown) {
-          setSolutionShown(true);
-          finalize(false, 0);
-        }
-      }
-    }
-  };
-
   const useHint = () => {
-    if (hintLevel < task.hints.length) {
-      setHintLevel((l) => l + 1);
-      playSound('tap');
-    }
+    if (hintLevel < task.hints.length) setHintLevel((l) => l + 1);
   };
 
   const showSolution = () => {
+    setHintLevel(task.hints.length);
     setSolutionShown(true);
-    playSound('tap');
-    if (!recorded) finalize(false, 0);
+    setStatus('revealed');
   };
 
-  const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      submit();
-    }
-  };
+  const inputDisabled = status === 'correct' || status === 'revealed';
 
-  const headerEmoji = useMemo(() => {
-    if (isExam) return '📝';
-    if (isReview) return '🔁';
-    return '🎯';
-  }, [isExam, isReview]);
-
-  const headerLabel = useMemo(() => {
-    if (isExam) return 'Контрольна';
-    if (isReview) return 'Повторення';
-    return `Тема: ${task.subtopic}`;
-  }, [isExam, isReview, task.subtopic]);
+  const headerLabel = isExam
+    ? `📝 ${examTitle ?? 'Контрольна'}`
+    : isReview
+      ? '🔁 Робота над помилками'
+      : `Задача ${index + 1} / ${tasks.length}`;
 
   return (
-    <div className="container-app">
-      <header className="flex items-center mb-3">
-        <button
-          onClick={() => {
-            reset();
-            navigate(isExam ? '/exams' : isReview ? '/errors' : '/practice');
-          }}
-          className="p-2 -ml-2 rounded-full hover:bg-slate-100"
-          aria-label="Назад"
-        >
-          <ChevronLeft size={24} />
-        </button>
-        <div className="ml-2 flex-1">
-          <div className="text-xs text-slate-500">
-            {headerEmoji} {headerLabel}
-          </div>
-          <div className="font-extrabold">
-            Задача {index + 1} з {total}
-          </div>
-        </div>
-      </header>
-
+    <div className="container-app min-h-screen flex flex-col">
       <div className="mb-4">
-        <ProgressBar value={index} max={total} />
+        <div className="flex justify-between items-center text-sm text-slate-500 mb-2">
+          <span>{headerLabel}</span>
+          <span>
+            {isExam || isReview
+              ? `№${index + 1} / ${tasks.length}`
+              : `Рівень ${task.difficulty}`}
+          </span>
+        </div>
+        <ProgressBar value={index} max={tasks.length} />
       </div>
 
-      <Card
-        className={
-          feedback === 'correct'
-            ? 'ring-4 ring-emerald-300 animate-pop-in'
-            : feedback === 'wrong'
-              ? 'ring-4 ring-rose-300'
-              : ''
-        }
-      >
-        <div className="text-xs uppercase tracking-wide text-slate-400 mb-1">
-          {task.subtopic}
-        </div>
-        <div className="text-2xl font-extrabold mb-5 whitespace-pre-wrap leading-snug">
+      <Card className="mb-4 flex-1">
+        <div className="text-xs uppercase tracking-wider text-slate-500 mb-2">{task.subtopic}</div>
+        <div className="text-3xl font-extrabold text-center my-6 leading-snug">
           {task.question}
         </div>
 
         {task.answerType === 'choice' && task.options ? (
-          <div className="grid grid-cols-2 gap-2 mb-4">
+          <div className="grid grid-cols-3 gap-2 mb-3">
             {task.options.map((opt) => (
-              <Button
+              <button
                 key={opt}
-                variant={value === opt ? 'primary' : 'secondary'}
                 onClick={() => {
-                  setValue(opt);
-                  playSound('tap');
+                  if (inputDisabled) return;
+                  setAnswer(opt);
+                  submit(opt);
                 }}
-                disabled={feedback === 'correct' || solutionShown}
+                disabled={inputDisabled}
+                className={clsx(
+                  'h-14 rounded-2xl border-2 text-2xl font-extrabold transition active:scale-95',
+                  answer === opt && status === 'correct' && 'border-emerald-400 bg-emerald-50 text-emerald-700',
+                  answer === opt && status === 'wrong' && 'border-rose-400 bg-rose-50',
+                  (answer !== opt || status === 'idle') && 'border-slate-200 hover:border-brand-400',
+                  inputDisabled && answer !== opt && 'opacity-50',
+                )}
               >
                 {opt}
-              </Button>
+              </button>
             ))}
           </div>
         ) : (
           <input
-            ref={inputRef}
             type="text"
-            inputMode={task.answerType === 'number' ? 'numeric' : 'text'}
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-            onKeyDown={onKeyDown}
+            inputMode={
+              task.answerType === 'number'
+                ? 'numeric'
+                : task.answerType === 'decimal'
+                  ? 'decimal'
+                  : 'text'
+            }
+            value={answer}
+            onChange={(e) => setAnswer(e.target.value)}
+            disabled={inputDisabled}
             placeholder="Твоя відповідь"
-            className="w-full h-14 text-xl text-center font-extrabold rounded-2xl border-2 border-slate-200 focus:border-brand-500 focus:outline-none mb-3"
-            disabled={feedback === 'correct' || solutionShown}
-            autoComplete="off"
+            className={clsx(
+              'w-full h-14 px-4 rounded-2xl border-2 outline-none text-2xl text-center font-extrabold mb-3',
+              status === 'wrong' && 'border-rose-400 bg-rose-50',
+              status === 'correct' && 'border-emerald-400 bg-emerald-50 text-emerald-700',
+              status === 'revealed' && 'border-slate-200 bg-slate-100',
+              status === 'idle' && 'border-slate-200 focus:border-brand-400',
+            )}
+            onKeyDown={(e) => e.key === 'Enter' && status === 'idle' && submit()}
+            autoFocus
           />
         )}
 
-        {feedback === 'correct' && (
-          <div className="flex items-center justify-center gap-2 text-emerald-600 font-extrabold mb-3 animate-pop-in">
-            <Check size={20} /> Правильно!
-          </div>
-        )}
-        {feedback === 'wrong' && (
-          <div className="flex items-center justify-center gap-2 text-rose-600 font-extrabold mb-3">
-            <X size={20} /> Спробуй ще раз
-          </div>
-        )}
-
-        <Button fullWidth size="lg" onClick={submit} disabled={!isExam && solutionShown && feedback !== 'correct'}>
-          {feedback === 'correct' || solutionShown ? 'Далі →' : 'Перевірити'}
-        </Button>
-
-        {!isExam && (
-          <div className="mt-4">
-            <HintPanel
-              hints={task.hints}
-              hintLevel={hintLevel}
-              solution={task.solution}
-              solutionShown={solutionShown}
-              onUseHint={useHint}
-              onShowSolution={showSolution}
-            />
-            {solutionShown && (
-              <Button fullWidth className="mt-3" onClick={goNext}>
-                Далі →
-              </Button>
+        {workbenchEnabled && status !== 'correct' && status !== 'revealed' && (
+          <button
+            onClick={() => setWorkbenchOpen(true)}
+            className={clsx(
+              'w-full h-11 rounded-2xl border-2 border-dashed font-bold text-sm flex items-center justify-center gap-2 mb-3 transition active:scale-[0.98]',
+              workbenchTouched
+                ? 'border-amber-300 bg-amber-50 text-amber-800 hover:border-amber-400'
+                : 'border-slate-200 bg-slate-50 text-slate-600 hover:border-brand-300 hover:text-brand-700',
             )}
+          >
+            <Wrench size={16} />
+            {workbenchTouched ? 'Відкрити робочий стіл (є записи)' : 'Робочий стіл'}
+            {workbenchTouched && (
+              <span className="w-2 h-2 rounded-full bg-amber-500" aria-hidden />
+            )}
+          </button>
+        )}
+
+        {status === 'wrong' && (
+          <div className="flex items-center gap-2 text-rose-600 text-sm mb-3 font-semibold">
+            <X size={18} /> Не зовсім, спробуй ще раз
+          </div>
+        )}
+        {status === 'correct' && (
+          <div className="flex items-center gap-2 text-emerald-600 font-extrabold mb-3">
+            <Check size={20} /> Правильно! +{computeStars()} ⭐
+          </div>
+        )}
+        {status === 'revealed' && (
+          <div className="text-slate-700 text-sm mb-3">
+            Подивись розв&apos;язання — наступного разу впораєшся!
+          </div>
+        )}
+
+        {(status === 'wrong' || status === 'revealed') && !isExam && (
+          <HintPanel
+            hints={task.hints}
+            hintLevel={hintLevel}
+            solution={task.solution}
+            solutionShown={solutionShown}
+            onUseHint={useHint}
+            onShowSolution={showSolution}
+          />
+        )}
+        {status === 'revealed' && isExam && (
+          <div className="rounded-2xl bg-slate-100 border border-slate-200 p-3 text-slate-800 text-sm whitespace-pre-line">
+            <div className="font-bold mb-1">Правильна відповідь:</div>
+            {task.solution}
           </div>
         )}
       </Card>
+
+      {status === 'idle' && task.answerType !== 'choice' && (
+        <Button size="lg" fullWidth onClick={() => submit()} disabled={!answer.trim()}>
+          Перевірити
+        </Button>
+      )}
+      {status === 'wrong' && task.answerType !== 'choice' && (
+        <Button size="lg" fullWidth onClick={() => submit()} disabled={!answer.trim()}>
+          Спробувати ще
+        </Button>
+      )}
+      {status === 'wrong' && task.answerType === 'choice' && (
+        <Button size="lg" fullWidth variant="secondary" onClick={() => setStatus('idle')}>
+          Спробувати ще
+        </Button>
+      )}
+      {(status === 'correct' || status === 'revealed') && (
+        <Button size="lg" fullWidth onClick={proceed}>
+          {index + 1 >= tasks.length ? 'Завершити' : 'Далі →'}
+        </Button>
+      )}
+
+      {workbenchEnabled && (
+        <Workbench
+          open={workbenchOpen}
+          onClose={() => {
+            setWorkbenchOpen(false);
+            setWorkbenchTouched(hasContent(getTaskState(task.id)));
+          }}
+          taskId={task.id}
+          topicId={topicId}
+          question={task.question}
+        />
+      )}
     </div>
   );
 }

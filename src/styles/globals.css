@@ -13,12 +13,28 @@
     @apply font-sans text-slate-900 bg-slate-50 antialiased;
     overscroll-behavior: none;
   }
+  /* На лендінгу — чистий білий фон і без overscroll-restrict
+     (щоб великий скрол не зависав на iOS). */
+  html.landing-mode body {
+    @apply bg-white;
+    overscroll-behavior: auto;
+  }
+  html.landing-mode,
+  html.landing-mode body,
+  html.landing-mode #root {
+    height: auto;
+    min-height: 100%;
+  }
   button {
     -webkit-tap-highlight-color: transparent;
   }
   input,
   textarea {
     font-size: 16px; /* prevents iOS zoom on focus */
+  }
+  /* SSR-фолбек ховаємо, як тільки React монтує перший компонент */
+  #root:has(> *:not(#ssr-fallback)) > #ssr-fallback {
+    display: none !important;
   }
 }
 

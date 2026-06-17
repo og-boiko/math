@@ -126,12 +126,13 @@ export const equationsBrackets: Generator = {
         estimatedSec: 45,
       };
     }
-    // (x - a) ÷ c = b
+    // (x - a) ÷ c = b — конструюємо детерміновано, щоб не потрапляти в рекурсію.
+    // Раніше було: випадковий xV у [15..30], і повторна спроба, якщо (xV-a)
+    // не ділилось на c націло. Зараз обираємо b, далі xV = b·c + a.
     const a = randInt(2, 10);
     const c = randInt(2, 5);
-    const xV = randInt(15, 30);
-    const b = (xV - a) / c;
-    if (!Number.isInteger(b)) return equationsBrackets.generate(difficulty);
+    const b = randInt(2, 8);
+    const xV = b * c + a;
     return {
       id: uid('eq-br-'),
       topicId: 'equations',
@@ -201,24 +202,37 @@ export const equationsWord: Generator = {
 /**
  * Подвійні нерівності: 12 < x ≤ 15.
  * Відповідь — всі цілі x, що задовольняють обидві нерівності, через кому.
+ *
+ * checkAnswer самостійно нормалізує списки чисел і порівнює як множини,
+ * тож «1, 2, 3», «3 2 1», «1;2;3» — усі приймаються. Тут лишаємо явні
+ * `acceptedAnswers` як зворотну сумісність зі старим кодом перевірки.
  */
 export const equationsDoubleInequality: Generator = {
   topicId: 'equations',
   subtopic: 'Подвійні нерівності',
   generate(difficulty: Difficulty): Task {
     const max = difficulty <= 2 ? 20 : difficulty === 3 ? 40 : 100;
-    const lo = randInt(0, max - 4);
     const spanMax = difficulty <= 2 ? 4 : difficulty === 3 ? 6 : 8;
-    const span = randInt(2, spanMax);
-    const hi = lo + span;
-    const leftStrict = randChoice([true, false]);
-    const rightStrict = randChoice([true, false]);
 
-    const start = leftStrict ? lo + 1 : lo;
-    const end = rightStrict ? hi - 1 : hi;
+    // Бортовий цикл замість рекурсії: спробуємо до 8 раз згенерувати
+    // непорожній набір цілих розв'язків. Якщо не вийшло — fallback.
+    let lo = 0, hi = 0, leftStrict = false, rightStrict = false;
     const solutions: number[] = [];
-    for (let i = start; i <= end; i++) solutions.push(i);
-    if (solutions.length === 0) return equationsDoubleInequality.generate(difficulty);
+    for (let attempt = 0; attempt < 8 && solutions.length === 0; attempt++) {
+      lo = randInt(0, max - 4);
+      const span = randInt(2, spanMax);
+      hi = lo + span;
+      leftStrict = randChoice([true, false]);
+      rightStrict = randChoice([true, false]);
+      const start = leftStrict ? lo + 1 : lo;
+      const end = rightStrict ? hi - 1 : hi;
+      for (let i = start; i <= end; i++) solutions.push(i);
+    }
+    if (solutions.length === 0) {
+      // Гарантований fallback: 1 ≤ x ≤ 3 → {1,2,3}
+      lo = 1; hi = 3; leftStrict = false; rightStrict = false;
+      solutions.push(1, 2, 3);
+    }
 
     const leftSign = leftStrict ? '<' : '≤';
     const rightSign = rightStrict ? '<' : '≤';
